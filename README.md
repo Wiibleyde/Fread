@@ -19,4 +19,4 @@ Notre projet devra :
 
 - Fullstack : Next.js
 - Base de données : PostgreSQL (Prisma)
-- Authentification : NextAuth.js
+- Authentification : NextAuth.js V5
