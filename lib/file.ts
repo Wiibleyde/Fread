@@ -6,7 +6,7 @@ export const saveFileToDisk = async (file: File): Promise<string> => {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const filesDir = path.join(process.cwd(), "files");
+    const filesDir = path.join(process.cwd(), "public", "files");
     mkdirSync(filesDir, { recursive: true });
 
     const extension = file.name.split(".").pop();
@@ -14,6 +14,6 @@ export const saveFileToDisk = async (file: File): Promise<string> => {
     const storedPath = path.join(filesDir, storedName);
     writeFileSync(storedPath, buffer);
 
-    const publicUrl = `/files/${storedName}`;
+    const publicUrl = `/public/files/${storedName}`;
     return publicUrl;
 };
