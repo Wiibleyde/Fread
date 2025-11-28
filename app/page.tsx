@@ -8,9 +8,7 @@ export default async function Home() {
             <form
                 action={async () => {
                     "use server";
-                    await signIn("discord", {
-                        redirectTo: "/admin",
-                    });
+                    await signIn("discord");
                 }}
             >
                 <button type="submit" className="w-full group relative">
