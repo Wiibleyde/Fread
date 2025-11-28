@@ -6,10 +6,52 @@ Fread is a social media platform (similar to Threads/Twitter) built with Next.js
 
 ## Architecture & Key Patterns
 
-We're working with the following architectural patterns and conventions:
+## File & Directory Architecture
 
-- Clean architecture principles
-- Layered structure: Database layer, Next.js app layer, and tooling layer
+Fread uses a layered, modular file structure to support clean architecture and maintainability:
+
+- **app/**: Next.js 16 App Router directory. Contains all route handlers, pages, layouts, and API endpoints. Subfolders:
+  - `api/`: Route handlers for API endpoints (REST/NextAuth).
+  - `generated/prisma/`: Prisma Client output (do not edit manually).
+  - `create-account/`, etc.: Feature-specific routes/pages.
+- **components/**: All React components, grouped by domain (e.g., `auth/`, `ui/`).
+- **lib/**: Shared utilities, Prisma singleton, helper functions. Subfolders for domain logic (e.g., `interfaces/`, `models/`, `queries/`, `services/`).
+- **prisma/**: Prisma schema and migrations. Source of truth for database models.
+- **public/**: Static assets (images, etc.).
+- **types/**: TypeScript type definitions for global/shared types.
+- **config files**: Project root contains config for Biome, Bun, Next.js, Docker, etc.
+
+### Key Directory Conventions
+
+- **Path Aliases**: Use `@/*` for root imports (see `tsconfig.json`).
+- **Prisma Client**: Always import from `@/app/generated/prisma/client`.
+- **Singletons**: Use `lib/prisma.ts` for PrismaClient instance.
+- **Component Grouping**: Domain-based folders (e.g., `auth/`, `ui/`) for clarity and reusability.
+- **No Feature Markdown**: Do not create markdown files for features unless documenting architecture.
+
+### Example File Layout
+
+```
+app/
+	api/
+		account/route.ts
+		auth/[...nextauth]/route.ts
+	create-account/page.tsx
+	generated/prisma/client.ts
+components/
+	auth/CreateAccountForm.tsx
+	ui/button.tsx
+lib/
+	prisma.ts
+	queries/account.queries.ts
+prisma/
+	schema.prisma
+	migrations/
+types/
+	auth.d.ts
+```
+
+Refer to this structure when adding new features, files, or refactoring code. Always keep domain logic, UI, and API routes separated for clarity and scalability.
 
 ### Database Layer
 
