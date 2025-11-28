@@ -1,6 +1,6 @@
-import { saveFileToDisk } from "@/lib/file";
-import type { AccountCreationInterface } from "../interface/account.interface";
-import { AccountUpdateSchema } from "../model/account.model";
+import { saveFileToDisk } from "@/lib/utils/file.util";
+import type { AccountCreationInterface } from "../interfaces/account.interface";
+import { AccountUpdateSchema } from "../models/account.model";
 import { updateAccountCreationDB } from "../queries/account.queries";
 import { createFileDB } from "../queries/file.queries";
 

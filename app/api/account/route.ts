@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { completeAccountCreation } from "@/lib/service/account.service";
+import { completeAccountCreation } from "@/lib/services/account.service";
 
 export async function POST(req: Request) {
     const session = await auth();

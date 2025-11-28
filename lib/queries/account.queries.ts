@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { AccountCreationInterface } from "../interface/account.interface";
+import type { AccountCreationInterface } from "../interfaces/account.interface";
 
 export const updateAccountCreationDB = (
   id: string,
