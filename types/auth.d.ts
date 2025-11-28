@@ -7,10 +7,16 @@ declare module "next-auth" {
         } & DefaultSession["user"];
         accessToken?: string;
         provider?: string;
+        isNewUser?: boolean;
     }
 
     interface JWT {
         accessToken?: string;
         provider?: string;
+        isNewUser?: boolean;
+    }
+
+    interface User {
+        isNewUser?: boolean;
     }
 }

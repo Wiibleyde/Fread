@@ -86,10 +86,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         description: "",
                     },
                 });
-                // Store the new user ID in the user object for JWT callback
+                // Store the new user ID for JWT callback
                 user.id = newUser.id;
+                user.isNewUser = true;
             }
-            // Always allow sign in - NextAuth will redirect new users to /create-account via pages.newUser
+            // Always allow sign in
             return true;
         },
         async jwt({ token, account, user }) {
@@ -115,6 +116,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 // If user.id is set (from signIn callback for new users), use it
                 if (user?.id) {
                     token.sub = user.id;
+                    // Mark as new user if this is initial sign-in
+                    if (user.isNewUser) {
+                        token.isNewUser = true;
+                    }
                 }
                 // Otherwise, fetch from database
                 else if (providerIdField && providerIdValue) {
@@ -146,6 +151,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.id = token.sub;
                 session.accessToken = token.accessToken as string;
                 session.provider = token.provider as string;
+                // Pass new user flag to session - this persists until they complete profile
+                if (token.isNewUser) {
+                    session.isNewUser = true;
+                }
             }
             return session;
         },
