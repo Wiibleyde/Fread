@@ -14,6 +14,6 @@ export const saveFileToDisk = async (file: File): Promise<string> => {
     const storedPath = path.join(filesDir, storedName);
     writeFileSync(storedPath, buffer);
 
-    const publicUrl = `/public/files/${storedName}`;
+    const publicUrl = `/files/${storedName}`;
     return publicUrl;
 };
