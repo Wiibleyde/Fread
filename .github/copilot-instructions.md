@@ -22,6 +22,7 @@ We're working with the following architectural patterns and conventions:
 - **App Router**: Using Next.js 16 App Router (`app/` directory).
 - **React Compiler**: Enabled via `babel-plugin-react-compiler` in `next.config.ts`.
 - **Path Aliases**: `@/*` maps to project root (see `tsconfig.json`).
+- **UI Components**: shadcn/ui for component library (Tailwind CSS-based, customizable components).
 
 ### Tooling
 
