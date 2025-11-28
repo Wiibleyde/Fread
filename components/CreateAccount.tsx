@@ -9,21 +9,53 @@ interface CreateAccountProps {
     session: Session;
 }
 
-const CreateAccount = ({ session }: CreateAccountProps) => {
+function CreateAccount({ session }: CreateAccountProps) {
     const [username, setUsername] = useState<string>(session?.user?.name || "");
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [fileName, setFileName] = useState<string>("");
-    const [fileUrl] = useState<string>(session?.user?.image || "");
+
+    const handleSubmit = async () => {
+        const form = new FormData();
+        form.append("username", username);
+        form.append("session", JSON.stringify(session));
+        if (profilePicture) {
+            form.append(
+                "file",
+                profilePicture,
+                fileName || profilePicture.name,
+            );
+        }
+        const response = await fetch("/api/auth/create-account", {
+            method: "POST",
+            body: form,
+        });
+
+        console.log("Account created:", response.status);
+    };
+
+    const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        setProfilePicture(f);
+        setFileName(f.name);
+    };
 
     return (
-        <div>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                void handleSubmit();
+            }}
+        >
             <Input
                 type="text"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
-            <Input
+            <input type="file" accept="image/*" onChange={handleFile} />
+
+            {/* <Input
                 type="file"
                 onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
@@ -31,13 +63,13 @@ const CreateAccount = ({ session }: CreateAccountProps) => {
                         setFileName(e.target.files[0].name);
                     }
                 }}
-            />
+            /> */}
 
             <Image
                 src={
                     profilePicture
                         ? URL.createObjectURL(profilePicture)
-                        : fileUrl
+                        : (session?.user?.image as string)
                 }
                 alt="Profile Picture"
                 width={100}
@@ -46,9 +78,16 @@ const CreateAccount = ({ session }: CreateAccountProps) => {
 
             <p>Selected file: {fileName}</p>
 
-            <Button>Create Account</Button>
-        </div>
+            <Button
+                type="submit"
+                onClick={async () => {
+                    await handleSubmit();
+                }}
+            >
+                Create Account
+            </Button>
+        </form>
     );
-};
+}
 
 export default CreateAccount;

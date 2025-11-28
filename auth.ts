@@ -147,6 +147,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token;
         },
         async session({ session, token }) {
+            console.log("Session callback token:", token);
+            console.log("Session callback session before:", session);
             if (token?.sub) {
                 session.user.id = token.sub;
                 session.accessToken = token.accessToken as string;
