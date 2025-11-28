@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
             new URL("https://lh3.googleusercontent.com/a/**"),
         ],
     },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: "10mb", // Allow up to 10MB for image uploads (we limit to 5MB client-side)
+        },
+    },
 };
 
 export default nextConfig;
