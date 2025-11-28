@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import CreateAccount from "@/components/CreateAccount";
 
 export default async function CreateAccountPage() {
     const session = await auth();
@@ -9,5 +10,9 @@ export default async function CreateAccountPage() {
         redirect("/");
     }
 
-    return <div>Create Account Page - Complete your profile</div>;
+    return (
+        <div>
+            <CreateAccount session={session} />
+        </div>
+    );
 }
