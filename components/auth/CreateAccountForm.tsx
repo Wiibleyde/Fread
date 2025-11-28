@@ -22,7 +22,7 @@ export default function CreateAccountForm({
         setLoading(true);
         const formData = new FormData(e.currentTarget);
         try {
-            const res = await fetch("/api/create-account", {
+            const res = await fetch("/api/account", {
                 method: "POST",
                 body: formData,
             });
