@@ -12,7 +12,12 @@ export function SignOut() {
             }}
             className="mt-4"
         >
-            <Button type="submit" variant="outline" size="lg" className="bg-red-600 hover:bg-red-700 text-white">
+            <Button
+                type="submit"
+                variant="outline"
+                size="lg"
+                className="bg-red-600 hover:bg-red-700 text-white"
+            >
                 Logout
             </Button>
         </form>
