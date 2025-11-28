@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -80,8 +81,7 @@ export default function CreateAccountForm({
                     </div>
                     {image && (
                         <div className="flex justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
+                            <Image
                                 src={image}
                                 alt="Current Profile Picture"
                                 width={100}
