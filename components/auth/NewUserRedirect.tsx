@@ -10,17 +10,17 @@ export function NewUserRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        console.log("NewUserRedirect - Status:", status);
-        console.log("NewUserRedirect - Session:", session);
-        console.log("NewUserRedirect - isNewUser:", session?.isNewUser);
-        console.log("NewUserRedirect - pathname:", pathname);
+        console.log("[NewUserRedirect] Status:", status);
+        console.log("[NewUserRedirect] Session:", session);
+        console.log("[NewUserRedirect] isNewUser:", session?.isNewUser);
+        console.log("[NewUserRedirect] pathname:", pathname);
 
         if (
             status === "authenticated" &&
             session?.isNewUser &&
             pathname !== "/create-account"
         ) {
-            console.log("Redirecting to /create-account");
+            console.log("[NewUserRedirect] Redirecting to /create-account");
             router.push("/create-account");
         }
     }, [session, status, pathname, router]);

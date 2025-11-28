@@ -8,15 +8,17 @@ declare module "next-auth" {
         accessToken?: string;
         provider?: string;
         isNewUser?: boolean;
+        admin?: boolean;
     }
 
     interface JWT {
         accessToken?: string;
         provider?: string;
-        isNewUser?: boolean;
+        needsOnboarding?: boolean;
+        admin?: boolean;
     }
 
     interface User {
-        isNewUser?: boolean;
+        needsOnboarding?: boolean;
     }
 }

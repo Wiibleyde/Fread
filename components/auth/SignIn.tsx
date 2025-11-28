@@ -27,7 +27,7 @@ export function SignIn({ provider }: SignInProps) {
         <form
             action={async () => {
                 "use server";
-                await signIn(provider);
+                await signIn(provider, { redirectTo: "/" });
             }}
         >
             <Button type="submit" variant="outline" size="lg">

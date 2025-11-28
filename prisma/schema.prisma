@@ -21,6 +21,7 @@ model Account {
   profilePictureId String?   @unique
   description      String
   private          Boolean   @default(false)
+  profileCompleted Boolean   @default(false)
   appleId          String?   @unique
   googleId         String?   @unique
   discordId        String?   @unique

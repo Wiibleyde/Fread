@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     reactCompiler: true,
     images: {
         remotePatterns: [
-            new URL('https://cdn.discordapp.com/avatars/**'),
-            new URL('https://lh3.googleusercontent.com/a/**'),
+            new URL("https://cdn.discordapp.com/avatars/**"),
+            new URL("https://lh3.googleusercontent.com/a/**"),
         ],
     },
 };

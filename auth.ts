@@ -22,11 +22,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: "jwt",
     },
-    pages: {
-        newUser: "/create-account",
-    },
     callbacks: {
         async signIn({ account, profile, user }) {
+            console.log("[SIGNIN] Starting signIn callback", {
+                provider: account?.provider,
+                providerAccountId: account?.providerAccountId,
+            });
+
             // Determine provider ID field
             let providerIdField = null;
             let providerIdValue = null;
@@ -41,7 +43,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 providerIdValue = account?.providerAccountId;
             }
 
-            if (!providerIdField || !providerIdValue) return false;
+            if (!providerIdField || !providerIdValue) {
+                console.log("[SIGNIN] ERROR: No provider field or value");
+                return false;
+            }
 
             // Check if user exists
             let whereClause: import("@/app/generated/prisma/client").Prisma.AccountWhereUniqueInput;
@@ -52,14 +57,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             } else if (providerIdField === "appleId") {
                 whereClause = { appleId: providerIdValue };
             } else {
+                console.log("[SIGNIN] ERROR: Invalid provider field");
                 return false;
             }
+
+            console.log("[SIGNIN] Checking if user exists:", whereClause);
+
             const dbUser = await prisma.account.findUnique({
                 where: whereClause,
+                select: {
+                    id: true,
+                    profileCompleted: true,
+                },
             });
 
+            console.log("[SIGNIN] User found:", dbUser);
+
             if (!dbUser) {
-                // Create user in DB
+                // Create NEW user in DB with profileCompleted: false
+                console.log("[SIGNIN] Creating new user");
                 const newUser = await prisma.account.create({
                     data: {
                         [providerIdField]: providerIdValue,
@@ -84,13 +100,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                                     ? profile.username
                                     : "New User",
                         description: "",
+                        profileCompleted: false,
                     },
                 });
-                // Store the new user ID for JWT callback
+                console.log("[SIGNIN] New user created:", newUser.id);
                 user.id = newUser.id;
-                user.isNewUser = true;
+                user.needsOnboarding = true;
+                // Return true to allow sign in, redirect will be handled by proxy
+                return true;
             }
-            // Always allow sign in
+
+            // Existing user
+            console.log(
+                "[SIGNIN] Existing user, profileCompleted:",
+                dbUser.profileCompleted,
+            );
+            user.id = dbUser.id;
+            user.needsOnboarding = !dbUser.profileCompleted;
+
+            // Always return true, let proxy handle redirect
             return true;
         },
         async jwt({ token, account, user }) {
@@ -99,65 +127,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.accessToken = account.access_token as string;
                 token.provider = account.provider as string;
 
-                // Get provider ID
-                let providerIdField = null;
-                let providerIdValue = null;
-                if (account?.provider === "google") {
-                    providerIdField = "googleId";
-                    providerIdValue = account?.providerAccountId;
-                } else if (account?.provider === "discord") {
-                    providerIdField = "discordId";
-                    providerIdValue = account?.providerAccountId;
-                } else if (account?.provider === "apple") {
-                    providerIdField = "appleId";
-                    providerIdValue = account?.providerAccountId;
-                }
-
-                // If user.id is set (from signIn callback for new users), use it
+                // Set user ID from signIn callback
                 if (user?.id) {
                     token.sub = user.id;
-                    // Mark as new user if this is initial sign-in
-                    if (user.isNewUser) {
-                        token.isNewUser = true;
-                    }
-                }
-                // Otherwise, fetch from database
-                else if (providerIdField && providerIdValue) {
-                    let whereClause: import("@/app/generated/prisma/client").Prisma.AccountWhereUniqueInput;
-                    if (providerIdField === "googleId") {
-                        whereClause = { googleId: providerIdValue };
-                    } else if (providerIdField === "discordId") {
-                        whereClause = { discordId: providerIdValue };
-                    } else if (providerIdField === "appleId") {
-                        whereClause = { appleId: providerIdValue };
-                    } else {
-                        return token;
-                    }
-
-                    const dbUser = await prisma.account.findUnique({
-                        where: whereClause,
-                        select: { id: true },
-                    });
-
-                    if (dbUser) {
-                        token.sub = dbUser.id;
-                    }
+                    token.needsOnboarding = user.needsOnboarding || false;
                 }
             }
+
+            // Check profile completion status and admin on every token refresh
+            if (token.sub) {
+                const dbUser = await prisma.account.findUnique({
+                    where: { id: token.sub as string },
+                    select: {
+                        profileCompleted: true,
+                        admin: true,
+                    },
+                });
+
+                if (dbUser) {
+                    token.needsOnboarding = !dbUser.profileCompleted;
+                    token.admin = dbUser.admin;
+                }
+            }
+
             return token;
         },
         async session({ session, token }) {
-            console.log("Session callback token:", token);
-            console.log("Session callback session before:", session);
             if (token?.sub) {
                 session.user.id = token.sub;
                 session.accessToken = token.accessToken as string;
                 session.provider = token.provider as string;
-                // Pass new user flag to session - this persists until they complete profile
-                if (token.isNewUser) {
-                    session.isNewUser = true;
-                }
+                session.isNewUser = token.needsOnboarding as boolean;
+                session.admin = token.admin as boolean;
             }
+
             return session;
         },
     },
