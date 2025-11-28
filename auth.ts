@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Google from "next-auth/providers/google";
+import { prisma } from "@/lib/prisma";
 import "./auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -21,11 +22,117 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: "jwt",
     },
+    pages: {
+        newUser: "/create-account",
+    },
     callbacks: {
+        async signIn({ account, profile }) {
+            // Determine provider ID field
+            let providerIdField = null;
+            let providerIdValue = null;
+            if (account?.provider === "google") {
+                providerIdField = "googleId";
+                providerIdValue = account?.providerAccountId;
+            } else if (account?.provider === "discord") {
+                providerIdField = "discordId";
+                providerIdValue = account?.providerAccountId;
+            } else if (account?.provider === "apple") {
+                providerIdField = "appleId";
+                providerIdValue = account?.providerAccountId;
+            }
+
+            if (!providerIdField || !providerIdValue) return false;
+
+            // Check if user exists
+            let whereClause: import("@/app/generated/prisma/client").Prisma.AccountWhereUniqueInput;
+            if (providerIdField === "googleId") {
+                whereClause = { googleId: providerIdValue };
+            } else if (providerIdField === "discordId") {
+                whereClause = { discordId: providerIdValue };
+            } else if (providerIdField === "appleId") {
+                whereClause = { appleId: providerIdValue };
+            } else {
+                return false;
+            }
+            const dbUser = await prisma.account.findUnique({
+                where: whereClause,
+            });
+
+            if (!dbUser) {
+                // Create user in DB
+                await prisma.account.create({
+                    data: {
+                        [providerIdField]: providerIdValue,
+                        username:
+                            typeof profile?.name === "string" && profile.name
+                                ? profile.name
+                                : typeof profile?.displayName === "string" &&
+                                    profile.displayName
+                                  ? profile.displayName
+                                  : typeof profile?.username === "string" &&
+                                      profile.username
+                                    ? profile.username
+                                    : "New User",
+                        displayName:
+                            typeof profile?.name === "string" && profile.name
+                                ? profile.name
+                                : typeof profile?.displayName === "string" &&
+                                    profile.displayName
+                                  ? profile.displayName
+                                  : typeof profile?.username === "string" &&
+                                      profile.username
+                                    ? profile.username
+                                    : "New User",
+                        description: "",
+                    },
+                });
+                // Mark as new user - NextAuth will redirect to /create-account
+                return "/create-account";
+            }
+            // User exists, allow sign in
+            return true;
+        },
         async jwt({ token, account }) {
             if (account) {
                 token.accessToken = account.access_token as string;
                 token.provider = account.provider as string;
+
+                // Get provider ID
+                let providerIdField = null;
+                let providerIdValue = null;
+                if (account?.provider === "google") {
+                    providerIdField = "googleId";
+                    providerIdValue = account?.providerAccountId;
+                } else if (account?.provider === "discord") {
+                    providerIdField = "discordId";
+                    providerIdValue = account?.providerAccountId;
+                } else if (account?.provider === "apple") {
+                    providerIdField = "appleId";
+                    providerIdValue = account?.providerAccountId;
+                }
+
+                // Check if user exists and get their ID
+                if (providerIdField && providerIdValue) {
+                    let whereClause: import("@/app/generated/prisma/client").Prisma.AccountWhereUniqueInput;
+                    if (providerIdField === "googleId") {
+                        whereClause = { googleId: providerIdValue };
+                    } else if (providerIdField === "discordId") {
+                        whereClause = { discordId: providerIdValue };
+                    } else if (providerIdField === "appleId") {
+                        whereClause = { appleId: providerIdValue };
+                    } else {
+                        return token;
+                    }
+
+                    const dbUser = await prisma.account.findUnique({
+                        where: whereClause,
+                        select: { id: true },
+                    });
+
+                    if (dbUser) {
+                        token.sub = dbUser.id;
+                    }
+                }
             }
             return token;
         },
