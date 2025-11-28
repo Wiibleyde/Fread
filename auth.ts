@@ -26,7 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         newUser: "/create-account",
     },
     callbacks: {
-        async signIn({ account, profile }) {
+        async signIn({ account, profile, user }) {
             // Determine provider ID field
             let providerIdField = null;
             let providerIdValue = null;
@@ -60,7 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             if (!dbUser) {
                 // Create user in DB
-                await prisma.account.create({
+                const newUser = await prisma.account.create({
                     data: {
                         [providerIdField]: providerIdValue,
                         username:
@@ -86,13 +86,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         description: "",
                     },
                 });
-                // Mark as new user - NextAuth will redirect to /create-account
-                return "/create-account";
+                // Store the new user ID in the user object for JWT callback
+                user.id = newUser.id;
             }
-            // User exists, allow sign in
+            // Always allow sign in - NextAuth will redirect new users to /create-account via pages.newUser
             return true;
         },
-        async jwt({ token, account }) {
+        async jwt({ token, account, user }) {
+            // On initial sign-in, set up the token
             if (account) {
                 token.accessToken = account.access_token as string;
                 token.provider = account.provider as string;
@@ -111,8 +112,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     providerIdValue = account?.providerAccountId;
                 }
 
-                // Check if user exists and get their ID
-                if (providerIdField && providerIdValue) {
+                // If user.id is set (from signIn callback for new users), use it
+                if (user?.id) {
+                    token.sub = user.id;
+                }
+                // Otherwise, fetch from database
+                else if (providerIdField && providerIdValue) {
                     let whereClause: import("@/app/generated/prisma/client").Prisma.AccountWhereUniqueInput;
                     if (providerIdField === "googleId") {
                         whereClause = { googleId: providerIdValue };
