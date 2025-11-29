@@ -28,7 +28,7 @@ export const getAccountByIdDB = (id: string) => {
       private: true,
       createdAt: true,
       updatedAt: true,
-      profilePicture: { select: { id: true, fileName: true } }
+      profilePicture: { select: { fileName: true } }
     },
   });
 };
