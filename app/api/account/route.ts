@@ -47,8 +47,8 @@ export async function GET() {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     try {
-        const { success, account } = await getAccountService(session.user.id);
-        return NextResponse.json({ success, account });
+        const { success, account, posts } = await getAccountService(session.user.id);
+        return NextResponse.json({ success, account, posts });
     } catch (err: any) {
         return NextResponse.json({ error: err.message || "Something went wrong" }, { status: 400 });
     }

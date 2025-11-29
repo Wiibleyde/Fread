@@ -7,6 +7,7 @@ import {
     updateAccountCreationDB,
 } from "../queries/account.queries";
 import { createFileDB } from "../queries/file.queries";
+import { getPostByUserIdDB } from "../queries/post.queries";
 
 export async function completeAccountCreation(
     accountId: string,
@@ -46,9 +47,10 @@ export async function deleteAccountService(accountId: string) {
 
 export async function getAccountService(accountId: string) {
     const account = await getAccountByIdDB(accountId);
+    const posts = await getPostByUserIdDB(accountId);
     // Récupérer le nombre de followers, following, posts, etc.
     if (!account) {
         throw new Error("Account not found");
     }
-    return { success: true, account };
+    return { success: true, account, posts };
 }
