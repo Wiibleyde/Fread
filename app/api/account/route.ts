@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { completeAccountCreation, deleteAccountService } from "@/lib/services/account.service";
+import {
+    completeAccountCreation,
+    deleteAccountService,
+    getAccountService,
+} from "@/lib/services/account.service";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,15 +19,13 @@ export async function POST(req: Request) {
     } catch (err: any) {
         return NextResponse.json(
             { error: err.message || "Something went wrong" },
-            { status: 400 }
+            { status: 400 },
         );
     }
 }
 
-
 export async function DELETE() {
     const session = await auth();
-    console.log("Delete account request for user:", session?.user?.id);
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -34,7 +36,20 @@ export async function DELETE() {
     } catch (err: any) {
         return NextResponse.json(
             { error: err.message || "Something went wrong" },
-            { status: 400 }
+            { status: 400 },
         );
+    }
+}
+
+export async function GET() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    try {
+        const { success, account } = await getAccountService(session.user.id);
+        return NextResponse.json({ success, account });
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message || "Something went wrong" }, { status: 400 });
     }
 }

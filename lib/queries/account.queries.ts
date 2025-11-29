@@ -20,6 +20,16 @@ export const deleteAccountDB = (id: string) => {
 export const getAccountByIdDB = (id: string) => {
   return prisma.account.findUnique({
     where: { id },
+    select: {
+      id: true,
+      username: true,
+      displayName: true,
+      description: true,
+      private: true,
+      createdAt: true,
+      updatedAt: true,
+      profilePicture: { select: { id: true, fileName: true } }
+    },
   });
 };
 

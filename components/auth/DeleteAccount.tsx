@@ -9,7 +9,7 @@ export function DeleteAccount() {
         try {
             const response = await fetch("/api/account", { method: "DELETE" });
             if (!response.ok) {
-                console.error("Failed to delete account");
+                console.error("Failed to delete account", await response.text());
                 return;
             }
             await signOut({ callbackUrl: "/" });
