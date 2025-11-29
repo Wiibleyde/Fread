@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { auth } from "@/auth";
+import { DeleteAccount } from "@/components/auth/DeleteAccount";
 import { SignIn } from "@/components/auth/SignIn";
 import { SignOut } from "@/components/auth/SignOut";
 
@@ -12,6 +13,7 @@ export default async function Home() {
             <SignIn provider="google" />
 
             <SignOut />
+            <DeleteAccount />
             <div>
                 {session ? (
                     <>
@@ -26,7 +28,6 @@ export default async function Home() {
                 ) : (
                     <p>No active session</p>
                 )}
-
             </div>
         </div>
     );

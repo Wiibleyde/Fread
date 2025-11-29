@@ -1,7 +1,7 @@
 import { saveFileToDisk } from "@/lib/utils/file.util";
 import type { AccountCreationInterface } from "../interfaces/account.interface";
 import { AccountUpdateSchema } from "../models/account.model";
-import { updateAccountCreationDB } from "../queries/account.queries";
+import { deleteAccountDB, updateAccountCreationDB } from "../queries/account.queries";
 import { createFileDB } from "../queries/file.queries";
 
 export async function completeAccountCreation(
@@ -31,5 +31,12 @@ export async function completeAccountCreation(
     // Update the account
     await updateAccountCreationDB(accountId, updateData);
 
+    return { success: true };
+}
+
+
+export async function deleteAccountService(accountId: string) {
+    // Suprimer tous les fichiers associés à ce compte, les posts, etc.
+    await deleteAccountDB(accountId);
     return { success: true };
 }
