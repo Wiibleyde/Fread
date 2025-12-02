@@ -1,15 +1,14 @@
-import express from 'express';
-import { env } from './env';
-import type { DiscordUser } from './models/discordUser';
-import { prisma } from './prisma';
-import { generateJWT } from './utils/jwt';
-import { createUserDB, getUserByUsernameDB } from './services/account.service';
+import express from "express";
+import { env } from "./env";
+import type { DiscordUser } from "./models/discordUser";
+import { createUserDB, getUserByUsernameDB } from "./services/account.service";
+import { generateJWT } from "./utils/jwt";
 
 const app = express();
 app.use(express.json());
 
-app.get('/status', (_req, res) => {
-    res.json({ status: 'ok' });
+app.get("/status", (_req, res) => {
+    res.json({ status: "ok" });
 });
 
 app.get("/auth/discord", (req, res) => {
@@ -24,19 +23,22 @@ app.get("/auth/discord/callback", async (req, res) => {
 
     try {
         // Échanger le code contre un access token
-        const tokenResponse = await fetch("https://discord.com/api/oauth2/token", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+        const tokenResponse = await fetch(
+            "https://discord.com/api/oauth2/token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    client_id: env.AUTH_DISCORD_ID,
+                    client_secret: env.AUTH_DISCORD_SECRET,
+                    grant_type: "authorization_code",
+                    code,
+                    redirect_uri: env.DISCORD_REDIRECT_URI,
+                }),
             },
-            body: new URLSearchParams({
-                client_id: env.AUTH_DISCORD_ID,
-                client_secret: env.AUTH_DISCORD_SECRET,
-                grant_type: "authorization_code",
-                code,
-                redirect_uri: env.DISCORD_REDIRECT_URI,
-            }),
-        });
+        );
 
         if (!tokenResponse.ok) {
             const errorText = await tokenResponse.text();
@@ -58,7 +60,7 @@ app.get("/auth/discord/callback", async (req, res) => {
             throw new Error(`User info request failed: ${errorText}`);
         }
 
-        const userDatas = await userResponse.json() as DiscordUser;
+        const userDatas = (await userResponse.json()) as DiscordUser;
 
         let user = await getUserByUsernameDB(userDatas.username);
 
@@ -68,7 +70,7 @@ app.get("/auth/discord/callback", async (req, res) => {
                 username: userDatas.username,
                 profileCompleted: false,
                 description: "",
-                displayName: userDatas.global_name || userDatas.username
+                displayName: userDatas.global_name || userDatas.username,
             });
         }
 
@@ -80,7 +82,6 @@ app.get("/auth/discord/callback", async (req, res) => {
         res.status(500).send(err.message || "Failed to authenticate");
     }
 });
-
 
 app.listen(env.PORT, () => {
     console.log(`API server running on http://localhost:${env.PORT}`);
