@@ -8,7 +8,7 @@ app.get('/status', (_req, res) => {
 });
 
 app.get("/auth/discord", (req, res) => {
-    const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=1444684530739974269&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fauth%2Fdiscord%2Fcallback&scope=identify+email`;
+    const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${env.AUTH_DISCORD_ID}&response_type=code&redirect_uri=${encodeURIComponent(env.DISCORD_REDIRECT_URI)}&scope=identify+email`;
     res.redirect(discordAuthUrl);
 });
 
