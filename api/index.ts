@@ -1,7 +1,12 @@
 import express from 'express';
 import { env } from './env';
+import type { DiscordUser } from './models/discordUser';
+import { prisma } from './prisma';
+import { generateJWT } from './utils/jwt';
+import { createUserDB, getUserByUsernameDB } from './services/account.service';
 
 const app = express();
+app.use(express.json());
 
 app.get('/status', (_req, res) => {
     res.json({ status: 'ok' });
@@ -53,16 +58,28 @@ app.get("/auth/discord/callback", async (req, res) => {
             throw new Error(`User info request failed: ${errorText}`);
         }
 
-        const user = await userResponse.json();
-        console.log("Discord user:", user);
+        const userDatas = await userResponse.json() as DiscordUser;
 
-        res.send(`Hello ${user.username} ${JSON.stringify(user)}`);
+        let user = await getUserByUsernameDB(userDatas.username);
+
+        if (!user) {
+            user = await createUserDB({
+                discordId: userDatas.id,
+                username: userDatas.username,
+                profileCompleted: false,
+                description: "",
+                displayName: userDatas.global_name || userDatas.username
+            });
+        }
+
+        const jwtToken = generateJWT(user);
+
+        res.json({ token: jwtToken });
     } catch (err: any) {
         console.error(err);
         res.status(500).send(err.message || "Failed to authenticate");
     }
 });
-
 
 
 app.listen(env.PORT, () => {
