@@ -7,6 +7,9 @@ const envSchema = z.object({
     AUTH_DISCORD_ID: z.string().min(1, 'AUTH_DISCORD_ID is required'),
     AUTH_DISCORD_SECRET: z.string().min(1, 'AUTH_DISCORD_SECRET is required'),
     DISCORD_REDIRECT_URI: z.string().url('DISCORD_REDIRECT_URI must be a valid URL'),
+    AUTH_GOOGLE_ID: z.string().min(1, 'AUTH_GOOGLE_ID is required'),
+    AUTH_GOOGLE_SECRET: z.string().min(1, 'AUTH_GOOGLE_SECRET is required'),
+    GOOGLE_REDIRECT_URI: z.string().url('GOOGLE_REDIRECT_URI must be a valid URL'),
 });
 
 const _env = envSchema.parse(process.env);
