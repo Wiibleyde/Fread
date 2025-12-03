@@ -2,7 +2,7 @@
 
 import express from "express";
 import { env } from "./env";
-import type { DiscordUser } from "./models/discordUser";
+import type { DiscordUser, GoogleUser } from "./models/discordUser";
 import { createUserDB, getUserByUsernameDB } from "./services/account.service";
 import { generateJWT } from "./utils/jwt";
 
@@ -150,12 +150,24 @@ app.get("/auth/google/callback", async (req, res) => {
             throw new Error(`User info failed: ${errorText}`);
         }
 
-        const user = await userResponse.json();
+        const userDatas = (await userResponse.json()) as GoogleUser;
 
-        console.log("Google user:", user);
+        let user = await getUserByUsernameDB(userDatas.email);
 
-        // Tu peux rediriger vers ton front ensuite
-        res.send(`Hello ${user.name} (${user.email})`);
+        if (!user) {
+            user = await createUserDB({
+                googleId: userDatas.sub,
+                username: userDatas.email,
+                profileCompleted: false,
+                description: "",
+                displayName: userDatas.name || userDatas.email,
+            });
+        }
+
+        const jwtToken = generateJWT(user);
+
+        res.json({ token: jwtToken });
+
     } catch (err: any) {
         console.error(err);
         res.status(500).send(err.message);
