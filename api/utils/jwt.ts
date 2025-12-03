@@ -1,6 +1,5 @@
+import jwt from "jsonwebtoken";
 import type { Account } from "../generated/prisma/client";
-import jwt from 'jsonwebtoken';
-
 
 export const generateJWT = (user: Account): string => {
     const payload = {
@@ -8,7 +7,7 @@ export const generateJWT = (user: Account): string => {
         username: user.username,
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-        expiresIn: '7d',
+        expiresIn: "7d",
     });
     return token;
 };
@@ -16,7 +15,7 @@ export const generateJWT = (user: Account): string => {
 export const verifyJWT = (token: string): jwt.JwtPayload | null => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-        if (typeof decoded === 'string') {
+        if (typeof decoded === "string") {
             return null;
         }
         return decoded;

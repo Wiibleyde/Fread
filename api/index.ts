@@ -2,8 +2,7 @@
 
 import express from "express";
 import { env } from "./env";
-import discordRouter from "./routes/auth/discord";
-import googleRouter from "./routes/auth/google";
+import authRouter from "./routes/auth";
 
 const app = express();
 app.use(express.json());
@@ -12,10 +11,7 @@ app.get("/status", (_req, res) => {
     res.json({ status: "ok" });
 });
 
-
-app.use(discordRouter);
-app.use(googleRouter);
-
+app.use("/auth", authRouter);
 
 app.listen(env.PORT, () => {
     console.log(`API server running on http://localhost:${env.PORT}`);

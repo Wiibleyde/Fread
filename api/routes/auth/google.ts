@@ -9,7 +9,7 @@ import { generateJWT } from "../../utils/jwt";
 
 const googleRouter = express.Router();
 
-googleRouter.get("/auth/google", (_req, res) => {
+googleRouter.get("/", (_req, res) => {
     const googleAuthUrl =
         "https://accounts.google.com/o/oauth2/v2/auth?" +
         new URLSearchParams({
@@ -24,7 +24,7 @@ googleRouter.get("/auth/google", (_req, res) => {
     res.redirect(googleAuthUrl);
 });
 
-googleRouter.get("/auth/google/callback", async (req, res) => {
+googleRouter.get("/callback", async (req, res) => {
     const code = req.query.code as string;
 
     if (!code) {

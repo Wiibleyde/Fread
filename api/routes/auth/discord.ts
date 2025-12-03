@@ -9,12 +9,12 @@ import { generateJWT } from "../../utils/jwt";
 
 const discordRouter = express.Router();
 
-discordRouter.get("/auth/discord", (_req, res) => {
+discordRouter.get("/", (_req, res) => {
     const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${env.AUTH_DISCORD_ID}&response_type=code&redirect_uri=${encodeURIComponent(env.DISCORD_REDIRECT_URI)}&scope=identify+email`;
     res.redirect(discordAuthUrl);
 });
 
-discordRouter.get("/auth/discord/callback", async (req, res) => {
+discordRouter.get("/callback", async (req, res) => {
     const code = req.query.code as string;
 
     if (!code) return res.status(400).send("Code missing");
