@@ -3,6 +3,7 @@
 import express from "express";
 import { env } from "./env";
 import authRouter from "./routes/auth";
+import testRouter from "./routes/test";
 
 const app = express();
 app.use(express.json());
@@ -12,6 +13,7 @@ app.get("/status", (_req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/test", testRouter);
 
 app.listen(env.PORT, () => {
     console.log(`API server running on http://localhost:${env.PORT}`);
