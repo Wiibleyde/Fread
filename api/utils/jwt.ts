@@ -20,7 +20,7 @@ export const verifyJWT = (token: string): JWTPayload | null => {
             return null;
         }
         return decoded as JWTPayload;
-    } catch (err) {
+    } catch (_err) {
         return null;
     }
 };

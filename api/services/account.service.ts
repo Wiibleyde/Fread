@@ -1,20 +1,19 @@
+import type { CreateAccountData } from "../models/account.model";
 import { prisma } from "../prisma";
-
-interface CreateAccountData {
-    username: string;
-    displayName: string;
-    description?: string | null;
-    private?: boolean;
-    profilePictureId?: string | null;
-    appleId?: string | null;
-    googleId?: string | null;
-    discordId?: string | null;
-    profileCompleted: boolean;
-}
 
 export const createUserDB = (data: CreateAccountData) => {
     return prisma.account.create({
-        data,
+        data: {
+            username: data.username,
+            displayName: data.displayName,
+            description: data.description as string,
+            private: data.private,
+            profilePictureId: data.profilePictureId,
+            appleId: data.appleId,
+            googleId: data.googleId,
+            discordId: data.discordId,
+            profileCompleted: data.profileCompleted,
+        }
     });
 }
 
