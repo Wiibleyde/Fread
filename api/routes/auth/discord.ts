@@ -2,8 +2,8 @@ import express from "express";
 import { env } from "../../env";
 import type { DiscordUser } from "../../models/discordUser";
 import {
-    createUserDB,
-    getUserByUsernameDB,
+    createAccountDB,
+    getAccountByUsernameDB,
 } from "../../services/account.service";
 import { generateJWT } from "../../utils/jwt";
 
@@ -60,10 +60,10 @@ discordRouter.get("/callback", async (req, res) => {
 
         const userDatas = (await userResponse.json()) as DiscordUser;
 
-        let user = await getUserByUsernameDB(userDatas.username);
+        let account = await getAccountByUsernameDB(userDatas.username);
 
-        if (!user) {
-            user = await createUserDB({
+        if (!account) {
+            account = await createAccountDB({
                 discordId: userDatas.id,
                 username: userDatas.username,
                 profileCompleted: false,
@@ -72,7 +72,7 @@ discordRouter.get("/callback", async (req, res) => {
             });
         }
 
-        const jwtToken = generateJWT(user);
+        const jwtToken = generateJWT(account);
 
         res.json({ token: jwtToken });
     } catch (err) {

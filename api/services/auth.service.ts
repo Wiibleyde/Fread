@@ -1,6 +1,6 @@
-import { getUserByIdDB } from "./account.service";
+import { getAccountByIdDB } from "./account.service";
 
 
 export async function authenticateUser(id: string) {
-    return await getUserByIdDB(id);
+    return await getAccountByIdDB(id);
 }

@@ -1,7 +1,7 @@
 import type { CreateAccountData } from "../models/account.model";
 import { prisma } from "../prisma";
 
-export const createUserDB = (data: CreateAccountData) => {
+export const createAccountDB = (data: CreateAccountData) => {
     return prisma.account.create({
         data: {
             username: data.username,
@@ -17,13 +17,13 @@ export const createUserDB = (data: CreateAccountData) => {
     });
 }
 
-export const getUserByUsernameDB = (username: string) => {
+export const getAccountByUsernameDB = (username: string) => {
     return prisma.account.findUnique({
         where: { username },
     });
 }
 
-export const getUserByIdDB = (id: string) => {
+export const getAccountByIdDB = (id: string) => {
     return prisma.account.findUnique({
         where: { id },
     });

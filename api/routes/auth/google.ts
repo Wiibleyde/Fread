@@ -2,8 +2,8 @@ import express from "express";
 import { env } from "../../env";
 import type { GoogleUser } from "../../models/discordUser";
 import {
-    createUserDB,
-    getUserByUsernameDB,
+    createAccountDB,
+    getAccountByUsernameDB,
 } from "../../services/account.service";
 import { generateJWT } from "../../utils/jwt";
 
@@ -75,10 +75,10 @@ googleRouter.get("/callback", async (req, res) => {
 
         const userDatas = (await userResponse.json()) as GoogleUser;
 
-        let user = await getUserByUsernameDB(userDatas.email);
+        let account = await getAccountByUsernameDB(userDatas.email);
 
-        if (!user) {
-            user = await createUserDB({
+        if (!account) {
+            account = await createAccountDB({
                 googleId: userDatas.sub,
                 username: userDatas.email,
                 profileCompleted: false,
@@ -87,7 +87,7 @@ googleRouter.get("/callback", async (req, res) => {
             });
         }
 
-        const jwtToken = generateJWT(user);
+        const jwtToken = generateJWT(account);
 
         res.json({ token: jwtToken });
     } catch (err) {

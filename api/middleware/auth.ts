@@ -21,13 +21,13 @@ export const authMiddleware = async (
             return res.status(401).json({ error: "Invalid token" });
         }
 
-        const user = await authenticateUser(payload.id);
+        const account = await authenticateUser(payload.id);
 
-        if (!user) {
+        if (!account) {
             return res.status(401).json({ error: "User not found" });
         }
 
-        req.user = user;
+        req.account = account;
         next();
     } catch (_err) {
         return res.status(401).json({ error: "Invalid or expired token" });
