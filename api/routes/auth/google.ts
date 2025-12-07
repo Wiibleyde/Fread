@@ -1,6 +1,6 @@
 import express from "express";
 import { env } from "../../env";
-import type { GoogleUser } from "../../models/discordUser";
+import type { GoogleUser } from "../../models/account.model";
 import {
     createAccountDB,
     getAccountByUsernameDB,
