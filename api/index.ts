@@ -1,5 +1,6 @@
 // Ce n'est que des tests pour l'instant le code est à revoir complètement
 
+import cors from "cors";
 import express from "express";
 import { env } from "./env";
 import authRouter from "./routes/auth";
@@ -8,6 +9,7 @@ import { dbHealthCheck } from "./utils/db";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/status", (_req, res) => {
     res.json({ status: "ok" });
