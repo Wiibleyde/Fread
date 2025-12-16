@@ -5,3 +5,15 @@ export const createFileDB = (accountId: string, fileName: string) => {
         data: { fileName, accountId },
     });
 }
+
+export const deleteFileDB = (fileId: string) => {
+    return prisma.file.delete({
+        where: { id: fileId },
+    });
+}
+
+export const getFileByIdDB = (fileId: string) => {
+    return prisma.file.findUnique({
+        where: { id: fileId },
+    });
+}
