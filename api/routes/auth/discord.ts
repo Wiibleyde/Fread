@@ -1,5 +1,4 @@
 import express from "express";
-import { env } from "../../env";
 import type { DiscordUser } from "../../models/account.model";
 import { prisma } from "../../prisma";
 import {
@@ -7,7 +6,7 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getCodeFromCallback } from "../../services/oauth.service";
+import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const discordRouter = express.Router();
@@ -20,32 +19,8 @@ discordRouter.get("/callback", async (req, res) => {
     const code = getCodeFromCallback(req, res);
 
     try {
-        // Échanger le code contre un access token
-        const tokenResponse = await fetch(
-            "https://discord.com/api/oauth2/token",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    client_id: env.AUTH_DISCORD_ID,
-                    client_secret: env.AUTH_DISCORD_SECRET,
-                    grant_type: "authorization_code",
-                    code,
-                    redirect_uri: env.DISCORD_REDIRECT_URI,
-                }),
-            },
-        );
 
-        if (!tokenResponse.ok) {
-            const errorText = await tokenResponse.text();
-            throw new Error(`Token request failed: ${errorText}`);
-        }
-
-        const tokenData = await tokenResponse.json();
-
-        const { access_token, token_type } = tokenData;
+        const { access_token, token_type } = await getAccessTokenFromCallback("discord", code);
 
         // Récupérer les infos de l'utilisateur
         const userResponse = await fetch("https://discord.com/api/users/@me", {

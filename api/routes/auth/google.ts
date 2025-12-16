@@ -1,5 +1,4 @@
 import express from "express";
-import { env } from "../../env";
 import type { GoogleUser } from "../../models/account.model";
 import { prisma } from "../../prisma";
 import {
@@ -7,7 +6,7 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getCodeFromCallback } from "../../services/oauth.service";
+import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const googleRouter = express.Router();
@@ -20,31 +19,8 @@ googleRouter.get("/callback", async (req, res) => {
     const code = getCodeFromCallback(req, res);
 
     try {
-        // Échanger le code contre un access_token + id_token
-        const tokenResponse = await fetch(
-            "https://oauth2.googleapis.com/token",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    client_id: env.AUTH_GOOGLE_ID,
-                    client_secret: env.AUTH_GOOGLE_SECRET,
-                    grant_type: "authorization_code",
-                    code,
-                    redirect_uri: env.GOOGLE_REDIRECT_URI,
-                }),
-            },
-        );
 
-        if (!tokenResponse.ok) {
-            const errorText = await tokenResponse.text();
-            throw new Error(`Token request failed: ${errorText}`);
-        }
-
-        const tokenData = await tokenResponse.json();
-        const { access_token } = tokenData;
+        const { access_token } = await getAccessTokenFromCallback("google", code);
 
         // Récupérer les infos user depuis Google
         const userResponse = await fetch(
