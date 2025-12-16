@@ -7,31 +7,17 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { createFileDB } from "../../services/file.service";
+import { buildAuthUrl, getCodeFromCallback } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const googleRouter = express.Router();
 
 googleRouter.get("/", (_req, res) => {
-    const googleAuthUrl =
-        "https://accounts.google.com/o/oauth2/v2/auth?" +
-        new URLSearchParams({
-            client_id: env.AUTH_GOOGLE_ID,
-            redirect_uri: env.GOOGLE_REDIRECT_URI,
-            response_type: "code",
-            scope: ["openid", "email", "profile"].join(" "),
-            access_type: "offline",
-            prompt: "consent",
-        });
-
-    res.redirect(googleAuthUrl);
+    res.redirect(buildAuthUrl("google"));
 });
 
 googleRouter.get("/callback", async (req, res) => {
-    const code = req.query.code as string;
-
-    if (!code) {
-        return res.status(400).send("Code missing");
-    }
+    const code = getCodeFromCallback(req, res);
 
     try {
         // Échanger le code contre un access_token + id_token
