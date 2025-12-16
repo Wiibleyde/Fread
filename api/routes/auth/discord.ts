@@ -6,6 +6,8 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { generateJWT } from "../../utils/jwt";
+import { createFileDB } from "../../services/file.service";
+import { prisma } from "../../prisma";
 
 const discordRouter = express.Router();
 
@@ -44,6 +46,7 @@ discordRouter.get("/callback", async (req, res) => {
         }
 
         const tokenData = await tokenResponse.json();
+        
         const { access_token, token_type } = tokenData;
 
         // Récupérer les infos de l'utilisateur
@@ -60,6 +63,8 @@ discordRouter.get("/callback", async (req, res) => {
 
         const userDatas = (await userResponse.json()) as DiscordUser;
 
+        console.log("Discord user data:", userDatas);
+
         let account = await getAccountByUsernameDB(userDatas.username);
 
         if (!account) {
@@ -70,6 +75,16 @@ discordRouter.get("/callback", async (req, res) => {
                 description: "",
                 displayName: userDatas.global_name || userDatas.username,
             });
+
+            // fetch la photo de profil et la stocker si elle existe
+            if (userDatas.avatar) {
+                const avatarUrl = `https://cdn.discordapp.com/avatars/${userDatas.id}/${userDatas.avatar}.png`;
+                const avatar = await createFileDB(account.id, avatarUrl);
+                await prisma.account.update({
+                    where: { id: account.id },
+                    data: { profilePictureId: avatar.id },
+                });
+            }
         }
 
         const jwtToken = generateJWT(account);

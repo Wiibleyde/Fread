@@ -6,6 +6,8 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { generateJWT } from "../../utils/jwt";
+import { createFileDB } from "../../services/file.service";
+import { prisma } from "../../prisma";
 
 const googleRouter = express.Router();
 
@@ -85,6 +87,15 @@ googleRouter.get("/callback", async (req, res) => {
                 description: "",
                 displayName: userDatas.name || userDatas.email,
             });
+
+            // fetch la photo de profil et la stocker si elle existe
+            if (userDatas.picture) {
+                const picture = await createFileDB(account.id, userDatas.picture);
+                await prisma.account.update({
+                    where: { id: account.id },
+                    data: { profilePictureId: picture.id },
+                });
+            }
         }
 
         const jwtToken = generateJWT(account);
