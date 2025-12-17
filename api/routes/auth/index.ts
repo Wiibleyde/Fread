@@ -1,10 +1,10 @@
 import express from "express";
-import discordRouter from "./discord";
-import googleRouter from "./google";
+import { registerRoutes } from "../../builder/routeRegister";
+import { createAuthRoutes } from "./auth.route";
 
 const authRouter = express.Router();
 
-authRouter.use("/discord", discordRouter);
-authRouter.use("/google", googleRouter);
+registerRoutes(authRouter, createAuthRoutes("discord"));
+registerRoutes(authRouter, createAuthRoutes("google"));
 
 export default authRouter;

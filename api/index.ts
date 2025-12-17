@@ -1,5 +1,3 @@
-// Ce n'est que des tests pour l'instant le code est à revoir complètement
-
 import cors from "cors";
 import express from "express";
 import { env } from "./env";

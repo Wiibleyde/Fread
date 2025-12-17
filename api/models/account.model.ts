@@ -23,3 +23,10 @@ export interface GoogleUser {
     picture: string | null;
     name: string | null;
 }
+
+export interface OauthInfos {
+    id: string;
+    username: string;
+    picture: string | null;
+    name: string | null;
+}
