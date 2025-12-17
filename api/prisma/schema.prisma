@@ -17,7 +17,7 @@ model Account {
   id               String    @id @default(cuid())
   username         String    @unique
   displayName      String
-  profilePicture   File?     @relation("ProfilePicture", fields: [profilePictureId], references: [id])
+  profilePicture   File?     @relation("ProfilePicture", fields: [profilePictureId], references: [id], onDelete: SetNull)
   profilePictureId String?   @unique
   description      String
   private          Boolean   @default(false)
@@ -39,7 +39,7 @@ model Account {
 
 model Post {
   id           String   @id @default(cuid())
-  account      Account  @relation(fields: [accountId], references: [id])
+  account      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId    String
   creationDate DateTime @default(now())
   content      String
@@ -54,7 +54,7 @@ model Post {
 
 model File {
   id           String   @id @default(cuid())
-  account      Account  @relation("AccountFiles", fields: [accountId], references: [id])
+  account      Account  @relation("AccountFiles", fields: [accountId], references: [id], onDelete: Cascade)
   accountId    String
   creationDate DateTime @default(now())
   fileName     String
@@ -67,15 +67,15 @@ model File {
 
 model Reply {
   id          String @id @default(cuid())
-  basePost    Post   @relation("BasePost", fields: [basePostId], references: [id])
+  basePost    Post   @relation("BasePost", fields: [basePostId], references: [id], onDelete: Cascade)
   basePostId  String
-  replyPost   Post   @relation("ReplyPost", fields: [replyPostId], references: [id])
+  replyPost   Post   @relation("ReplyPost", fields: [replyPostId], references: [id], onDelete: Cascade)
   replyPostId String @unique
 }
 
 model Like {
   id        String   @id @default(cuid())
-  account   Account  @relation(fields: [accountId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String
   post      Post     @relation(fields: [postId], references: [id])
   postId    String
@@ -84,9 +84,9 @@ model Like {
 
 model Follow {
   id                String   @id @default(cuid())
-  account           Account  @relation("Follower", fields: [accountId], references: [id])
+  account           Account  @relation("Follower", fields: [accountId], references: [id], onDelete: Cascade)
   accountId         String
-  followedAccount   Account  @relation("Followed", fields: [followedAccountId], references: [id])
+  followedAccount   Account  @relation("Followed", fields: [followedAccountId], references: [id], onDelete: Cascade)
   followedAccountId String
   createdAt         DateTime @default(now())
 }

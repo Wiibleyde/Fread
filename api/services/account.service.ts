@@ -42,3 +42,9 @@ export const getAccountByIdDB = (id: string) => {
         }
     });
 }
+
+export const deleteAccount = (id: string) => {
+    return prisma.account.delete({
+        where: { id },
+    });
+}
