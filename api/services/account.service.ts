@@ -33,6 +33,12 @@ export const getAccountByIdDB = (id: string) => {
             description: true,
             private: true,
             createdAt: true,
+            profilePicture: {
+                select: {
+                    id: true,
+                    fileName: true
+                }
+            }
         }
     });
 }
