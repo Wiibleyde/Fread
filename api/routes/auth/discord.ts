@@ -1,12 +1,7 @@
 import express from "express";
 import type { DiscordUser } from "../../models/account.model";
-import { prisma } from "../../prisma";
-import {
-    createAccountDB,
-    getAccountByUsernameDB,
-} from "../../services/account.service";
-import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
+import { getAccountByUsernameDB } from "../../services/account.service";
+import { buildAuthUrl, createUser, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const discordRouter = express.Router();
@@ -23,30 +18,11 @@ discordRouter.get("/callback", async (req, res) => {
         const { access_token, token_type } = await getAccessTokenFromCallback("discord", code);
 
         const userDatas = await getUserInfo("discord", access_token, token_type) as DiscordUser;
-
-        console.log("Discord user data:", userDatas);
-
+        
         let account = await getAccountByUsernameDB(userDatas.username);
 
         if (!account) {
-            account = await createAccountDB({
-                discordId: userDatas.id,
-                username: userDatas.username,
-                profileCompleted: false,
-                description: "",
-                displayName: userDatas.global_name || userDatas.username,
-            });
-
-            // fetch la photo de profil et la stocker si elle existe
-            let avatarUrl = "";
-            if (userDatas.avatar) {
-                avatarUrl = `https://cdn.discordapp.com/avatars/${userDatas.id}/${userDatas.avatar}.png`;
-            }
-            const avatar = await createFileDB(account.id, avatarUrl);
-            await prisma.account.update({
-                where: { id: account.id },
-                data: { profilePictureId: avatar.id },
-            });
+            account = await createUser("discord", userDatas);
         }
 
         const jwtToken = generateJWT(account);

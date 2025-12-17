@@ -1,6 +1,10 @@
 import type { Request, Response } from "express";
 import { env } from "../env";
 import type { DiscordUser, GoogleUser } from "../models/account.model";
+import type { Account } from "../generated/prisma/client";
+import { createAccountDB } from "./account.service";
+import { prisma } from "../prisma";
+import { createFileDB } from "./file.service";
 
 export const buildAuthUrl = (provider: "discord" | "google"): string => {
     switch (provider) {
@@ -117,4 +121,51 @@ export const getUserInfo = async (provider: "discord" | "google", access_token: 
     const userDatas = await userResponse.json();
 
     return userDatas as DiscordUser | GoogleUser;
+}
+
+export const createUser = async (provider: "discord" | "google", userDatas: DiscordUser | GoogleUser): Promise<Account> => {
+    let account: Account;
+    if (provider === "discord") {
+        const userDiscord = userDatas as DiscordUser;
+        account = await createAccountDB({
+            discordId: userDiscord.id,
+            username: userDiscord.username,
+            profileCompleted: false,
+            description: "",
+            displayName: userDiscord.global_name || userDiscord.username,
+        });
+
+        // fetch la photo de profil et la stocker si elle existe
+        let avatarUrl = "";
+        if (userDiscord.avatar) {
+            avatarUrl = `https://cdn.discordapp.com/avatars/${userDiscord.id}/${userDiscord.avatar}.png`;
+        }
+        const avatar = await createFileDB(account.id, avatarUrl);
+        await prisma.account.update({
+            where: { id: account.id },
+            data: { profilePictureId: avatar.id },
+        });
+    } else if (provider === "google") {
+        const userGoogle = userDatas as GoogleUser;
+        account = await createAccountDB({
+            googleId: userGoogle.sub,
+            username: userGoogle.email,
+            profileCompleted: false,
+            description: "",
+            displayName: userGoogle.name || userGoogle.email,
+        });
+
+        const picture = await createFileDB(
+            account.id,
+            userGoogle.picture || "",
+        );
+        await prisma.account.update({
+            where: { id: account.id },
+            data: { profilePictureId: picture.id },
+        });
+    } else {
+        throw new Error("Unsupported provider");
+    }
+
+    return account;
 }

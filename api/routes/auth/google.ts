@@ -1,12 +1,7 @@
 import express from "express";
 import type { GoogleUser } from "../../models/account.model";
-import { prisma } from "../../prisma";
-import {
-    createAccountDB,
-    getAccountByUsernameDB,
-} from "../../services/account.service";
-import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
+import { getAccountByUsernameDB } from "../../services/account.service";
+import { buildAuthUrl, createUser, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const googleRouter = express.Router();
@@ -22,29 +17,12 @@ googleRouter.get("/callback", async (req, res) => {
 
         const { access_token } = await getAccessTokenFromCallback("google", code);
 
-        const userDatas= await getUserInfo("google", access_token, "Bearer") as GoogleUser;
-
-        console.log("Google user data:", userDatas);
+        const userDatas = await getUserInfo("google", access_token, "Bearer") as GoogleUser;
 
         let account = await getAccountByUsernameDB(userDatas.email);
 
         if (!account) {
-            account = await createAccountDB({
-                googleId: userDatas.sub,
-                username: userDatas.email,
-                profileCompleted: false,
-                description: "",
-                displayName: userDatas.name || userDatas.email,
-            });
-
-            const picture = await createFileDB(
-                account.id,
-                userDatas.picture || "",
-            );
-            await prisma.account.update({
-                where: { id: account.id },
-                data: { profilePictureId: picture.id },
-            });
+            account = await createUser("google", userDatas);
         }
 
         const jwtToken = generateJWT(account);
