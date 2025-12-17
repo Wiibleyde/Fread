@@ -120,7 +120,7 @@ export const getUserInfo = async (
         const userDatas = (await userResponse.json()) as DiscordUser;
 
         return {
-            id: userDatas.id,
+            discordId: userDatas.id,
             username: userDatas.username,
             picture: userDatas.avatar
                 ? `https://cdn.discordapp.com/avatars/${userDatas.id}/${userDatas.avatar}.png`
@@ -145,7 +145,7 @@ export const getUserInfo = async (
         const userDatas = (await userResponse.json()) as GoogleUser;
 
         return {
-            id: userDatas.sub,
+            googleId: userDatas.sub,
             username: userDatas.email,
             picture: userDatas.picture,
             name: userDatas.name,
@@ -156,12 +156,11 @@ export const getUserInfo = async (
 };
 
 export const createUser = async (
-    userDatas: OauthInfos,
-    provider: "discord" | "google",
+    userDatas: OauthInfos
 ): Promise<Account> => {
     const account = await createAccountDB({
-        discordId: provider === "discord" ? userDatas.id : null,
-        googleId: userDatas.id === "google" ? userDatas.id : null,
+        googleId: userDatas.googleId,
+        discordId: userDatas.discordId,
         username: userDatas.username,
         profileCompleted: false,
         description: "",

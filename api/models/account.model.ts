@@ -25,7 +25,8 @@ export interface GoogleUser {
 }
 
 export interface OauthInfos {
-    id: string;
+    googleId?: string;
+    discordId?: string;
     username: string;
     picture: string | null;
     name: string | null;
