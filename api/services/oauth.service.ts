@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { env } from "../env";
+import type { DiscordUser, GoogleUser } from "../models/account.model";
 
 export const buildAuthUrl = (provider: "discord" | "google"): string => {
     switch (provider) {
@@ -84,4 +85,36 @@ export const getAccessTokenFromCallback = async (provider: "discord" | "google",
     const { access_token, token_type } = tokenData as { access_token: string; token_type: string };
 
     return { access_token, token_type };
+}
+
+export const getUserInfo = async (provider: "discord" | "google", access_token: string, token_type: string): Promise<DiscordUser | GoogleUser> => {
+    let userResponse: globalThis.Response;
+
+    if (provider === "discord") {
+        userResponse = await fetch("https://discord.com/api/users/@me", {
+            headers: {
+                Authorization: `${token_type} ${access_token}`,
+            },
+        });
+    } else if (provider === "google") {
+        userResponse = await fetch(
+            "https://openidconnect.googleapis.com/v1/userinfo",
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            },
+        );
+    } else {
+        throw new Error("Unsupported provider");
+    }
+
+    if (!userResponse.ok) {
+        const errorText = await userResponse.text();
+        throw new Error(`User info failed: ${errorText}`);
+    }
+
+    const userDatas = await userResponse.json();
+
+    return userDatas as DiscordUser | GoogleUser;
 }

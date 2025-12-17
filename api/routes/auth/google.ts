@@ -6,7 +6,7 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback } from "../../services/oauth.service";
+import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const googleRouter = express.Router();
@@ -22,22 +22,9 @@ googleRouter.get("/callback", async (req, res) => {
 
         const { access_token } = await getAccessTokenFromCallback("google", code);
 
-        // Récupérer les infos user depuis Google
-        const userResponse = await fetch(
-            "https://openidconnect.googleapis.com/v1/userinfo",
-            {
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                },
-            },
-        );
+        const userDatas= await getUserInfo("google", access_token, "Bearer") as GoogleUser;
 
-        if (!userResponse.ok) {
-            const errorText = await userResponse.text();
-            throw new Error(`User info failed: ${errorText}`);
-        }
-
-        const userDatas = (await userResponse.json()) as GoogleUser;
+        console.log("Google user data:", userDatas);
 
         let account = await getAccountByUsernameDB(userDatas.email);
 

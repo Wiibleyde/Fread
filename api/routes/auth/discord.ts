@@ -6,7 +6,7 @@ import {
     getAccountByUsernameDB,
 } from "../../services/account.service";
 import { createFileDB } from "../../services/file.service";
-import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback } from "../../services/oauth.service";
+import { buildAuthUrl, getAccessTokenFromCallback, getCodeFromCallback, getUserInfo } from "../../services/oauth.service";
 import { generateJWT } from "../../utils/jwt";
 
 const discordRouter = express.Router();
@@ -22,19 +22,7 @@ discordRouter.get("/callback", async (req, res) => {
 
         const { access_token, token_type } = await getAccessTokenFromCallback("discord", code);
 
-        // Récupérer les infos de l'utilisateur
-        const userResponse = await fetch("https://discord.com/api/users/@me", {
-            headers: {
-                Authorization: `${token_type} ${access_token}`,
-            },
-        });
-
-        if (!userResponse.ok) {
-            const errorText = await userResponse.text();
-            throw new Error(`User info request failed: ${errorText}`);
-        }
-
-        const userDatas = (await userResponse.json()) as DiscordUser;
+        const userDatas = await getUserInfo("discord", access_token, token_type) as DiscordUser;
 
         console.log("Discord user data:", userDatas);
 
