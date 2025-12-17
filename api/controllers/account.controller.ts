@@ -32,7 +32,7 @@ class AccountController {
         }
 
         console.log(`Deleting account with ID: ${account.id}`);
-        // Suppression des posts, likes, commmentaires, fichier et comptes de l'utilisateur
+        
         try {
             await deleteAccount(account.id);
         } catch (error) {
