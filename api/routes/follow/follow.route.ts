@@ -14,6 +14,14 @@ const createFollowRoutes = (): RouteDescriptor[] => {
             middlewares: [
                 authMiddleware
             ]
+        },
+        {
+            method: "delete",
+            path: "/:id",
+            handler: controller.unfullowAccount,
+            middlewares: [
+                authMiddleware
+            ]
         }
     ];
 };

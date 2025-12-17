@@ -1,8 +1,15 @@
 import { prisma } from "../prisma";
 
-export const followAccount = async (followerId: string, followedAccountId: string) => {
-    return prisma.follow.create({
-        data: {
+export const followAccountDB = async (followerId: string, followedAccountId: string) => {
+    return prisma.follow.upsert({
+        where: {
+            accountId_followedAccountId: {
+                accountId: followerId,
+                followedAccountId: followedAccountId,
+            }
+        },
+        update: {},
+        create: {
             accountId: followerId,
             followedAccountId: followedAccountId,
         }
@@ -10,10 +17,12 @@ export const followAccount = async (followerId: string, followedAccountId: strin
 };
 
 export const unfollowAccount = async (followerId: string, followedAccountId: string) => {
-    return prisma.follow.deleteMany({
+    return prisma.follow.delete({
         where: {
-            accountId: followerId,
-            followedAccountId: followedAccountId,
+            accountId_followedAccountId: {
+                accountId: followerId,
+                followedAccountId: followedAccountId,
+            }
         }
     });
 };

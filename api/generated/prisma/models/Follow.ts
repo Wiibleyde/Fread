@@ -189,6 +189,7 @@ export type FollowOrderByWithRelationInput = {
 
 export type FollowWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  accountId_followedAccountId?: Prisma.FollowAccountIdFollowedAccountIdCompoundUniqueInput
   AND?: Prisma.FollowWhereInput | Prisma.FollowWhereInput[]
   OR?: Prisma.FollowWhereInput[]
   NOT?: Prisma.FollowWhereInput | Prisma.FollowWhereInput[]
@@ -197,7 +198,7 @@ export type FollowWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Follow"> | Date | string
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   followedAccount?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
-}, "id">
+}, "id" | "accountId_followedAccountId">
 
 export type FollowOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -274,6 +275,11 @@ export type FollowListRelationFilter = {
 
 export type FollowOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type FollowAccountIdFollowedAccountIdCompoundUniqueInput = {
+  accountId: string
+  followedAccountId: string
 }
 
 export type FollowCountOrderByAggregateInput = {
