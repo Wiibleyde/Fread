@@ -1,9 +1,7 @@
 import AuthController from "../../controllers/auth.controller";
 import type { RouteDescriptor } from "../../models/route.model";
 
-
-
-export function createAuthRoutes(provider: "discord" | "google"): RouteDescriptor[] {
+const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => {
     const controller = new AuthController(provider);
     const basePath = `/${provider}`;
 
@@ -20,3 +18,5 @@ export function createAuthRoutes(provider: "discord" | "google"): RouteDescripto
         },
     ];
 }
+
+export default createAuthRoutes;
