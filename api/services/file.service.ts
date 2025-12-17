@@ -17,3 +17,12 @@ export const getFileByIdDB = (fileId: string) => {
         where: { id: fileId },
     });
 }
+
+export const getProfilePictureByProfileForIdDB = (profileForId: string) => {
+    return prisma.file.findUnique({
+        where: { profileForId },
+        select: {
+            fileName: true,
+        }
+    });
+}
