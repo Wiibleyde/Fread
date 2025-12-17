@@ -157,9 +157,11 @@ export const getUserInfo = async (
 
 export const createUser = async (
     userDatas: OauthInfos,
+    provider: "discord" | "google",
 ): Promise<Account> => {
     const account = await createAccountDB({
-        googleId: userDatas.id,
+        discordId: provider === "discord" ? userDatas.id : null,
+        googleId: userDatas.id === "google" ? userDatas.id : null,
         username: userDatas.username,
         profileCompleted: false,
         description: "",

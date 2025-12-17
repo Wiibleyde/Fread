@@ -38,7 +38,7 @@ class AuthController {
             let account = await getAccountByUsernameDB(userDatas.username);
 
             if (!account) {
-                account = await createUser(userDatas);
+                account = await createUser(userDatas, this.provider);
             }
 
             const jwtToken = generateJWT(account);
