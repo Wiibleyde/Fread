@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./env";
+import accountRouter from "./routes/account";
 import authRouter from "./routes/auth";
 import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
@@ -15,6 +16,7 @@ app.get("/status", (_req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/test", testRouter);
+app.use("/account", accountRouter);
 
 app.listen(env.PORT, async () => {
     await dbHealthCheck();
