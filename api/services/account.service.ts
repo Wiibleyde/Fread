@@ -38,7 +38,9 @@ export const getAccountByIdDB = (id: string) => {
                     id: true,
                     fileName: true
                 }
-            }
+            },
+            follows: { select: { followedAccountId: true } },
+            followedBy: { select: { accountId: true } },
         }
     });
 }
