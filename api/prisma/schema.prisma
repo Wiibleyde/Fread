@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id               String    @id @default(cuid())
+  username         String    @unique
+  displayName      String
+  profilePicture   File?     @relation("ProfilePicture", fields: [profilePictureId], references: [id])
+  profilePictureId String?   @unique
+  description      String
+  private          Boolean   @default(false)
+  profileCompleted Boolean   @default(false)
+  appleId          String?   @unique
+  googleId         String?   @unique
+  discordId        String?   @unique
+  admin            Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
+
+  // Relations
+  likes      Like[]
+  posts      Post[]
+  follows    Follow[] @relation("Follower")
+  followedBy Follow[] @relation("Followed")
+  files      File[]   @relation("AccountFiles")
+}
+
+model Post {
+  id           String   @id @default(cuid())
+  account      Account  @relation(fields: [accountId], references: [id])
+  accountId    String
+  creationDate DateTime @default(now())
+  content      String
+  attachments  File[]   @relation("PostAttachments")
+  private      Boolean  @default(false)
+
+  // Relations
+  likes   Like[]
+  replies Reply[] @relation("BasePost")
+  replyTo Reply?  @relation("ReplyPost")
+}
+
+model File {
+  id           String   @id @default(cuid())
+  account      Account  @relation("AccountFiles", fields: [accountId], references: [id])
+  accountId    String
+  creationDate DateTime @default(now())
+  fileName     String
+
+  // Relations
+  posts        Post[]   @relation("PostAttachments")
+  profileFor   Account? @relation("ProfilePicture")
+  profileForId String?  @unique
+}
+
+model Reply {
+  id          String @id @default(cuid())
+  basePost    Post   @relation("BasePost", fields: [basePostId], references: [id])
+  basePostId  String
+  replyPost   Post   @relation("ReplyPost", fields: [replyPostId], references: [id])
+  replyPostId String @unique
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  id                String   @id @default(cuid())
+  account           Account  @relation("Follower", fields: [accountId], references: [id])
+  accountId         String
+  followedAccount   Account  @relation("Followed", fields: [followedAccountId], references: [id])
+  followedAccountId String
+  createdAt         DateTime @default(now())
+}
