@@ -1,4 +1,5 @@
-import type { Request, Response } from "express";
+import type { Request } from "express";
+import InternalError from "../errors/internal.error";
 import { getAccountByUsernameDB } from "../services/account.service";
 import {
     buildAuthUrl,
@@ -16,18 +17,16 @@ class AuthController {
         this.provider = provider;
     }
 
-    redirect = (_req: Request, res: Response) => {
-        res.redirect(buildAuthUrl(this.provider));
+    redirect = () => {
+        return buildAuthUrl(this.provider);
     };
 
-    callback = async (req: Request, res: Response) => {
-        const code = getCodeFromCallback(req, res);
+    callback = async (req: Request) => {
+        const code = getCodeFromCallback(req);
 
         try {
-            const { access_token, token_type } = await getAccessTokenFromCallback(
-                this.provider,
-                code,
-            );
+            const { access_token, token_type } =
+                await getAccessTokenFromCallback(this.provider, code);
 
             const userDatas = await getUserInfo(
                 this.provider,
@@ -43,11 +42,11 @@ class AuthController {
 
             const jwtToken = generateJWT(account);
 
-            res.json({ token: jwtToken });
-        } catch (err) {
-            console.error(err);
-            const message = err instanceof Error ? err.message : String(err);
-            res.status(500).send(message || "Failed to authenticate");
+            return { token: jwtToken };
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : String(error);
+            throw new InternalError(`Authentication failed: ${errorMessage}`);
         }
     };
 }

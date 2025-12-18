@@ -1,5 +1,6 @@
 import AuthController from "../../controllers/auth.controller";
 import type { RouteDescriptor } from "../../models/route.model";
+import asyncHandler from "../../utils/handler";
 
 const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => {
     const controller = new AuthController(provider);
@@ -9,12 +10,18 @@ const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => 
         {
             method: "get",
             path: `${basePath}`,
-            handler: controller.redirect,
+            handler: asyncHandler(async (_req, res) => {
+                const result = controller.redirect();
+                res.redirect(result);
+            }),
         },
         {
             method: "get",
             path: `${basePath}/callback`,
-            handler: controller.callback,
+            handler: asyncHandler(async (_req, res) => {
+                const result = await controller.callback(_req);
+                res.json(result);
+            }),
         },
     ];
 }

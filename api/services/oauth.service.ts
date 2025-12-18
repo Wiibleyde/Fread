@@ -1,5 +1,6 @@
-import type { Request, Response } from "express";
+import type { Request } from "express";
 import { env } from "../env";
+import BadRequestError from "../errors/badrequest.error";
 import type { Account } from "../generated/prisma/client";
 import type {
     DiscordUser,
@@ -31,11 +32,11 @@ export const buildAuthUrl = (provider: "discord" | "google"): string => {
     }
 };
 
-export const getCodeFromCallback = (req: Request, res: Response): string => {
+export const getCodeFromCallback = (req: Request): string => {
     const code = req.query.code as string;
 
     if (!code) {
-        res.status(400).send("Code missing");
+        throw new BadRequestError("Code missing");
     }
 
     return code;
@@ -155,9 +156,7 @@ export const getUserInfo = async (
     }
 };
 
-export const createUser = async (
-    userDatas: OauthInfos
-): Promise<Account> => {
+export const createUser = async (userDatas: OauthInfos): Promise<Account> => {
     const account = await createAccountDB({
         googleId: userDatas.googleId,
         discordId: userDatas.discordId,
