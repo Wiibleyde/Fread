@@ -17,7 +17,7 @@ const createFollowRoutes = (): RouteDescriptor[] => {
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.followAccount(req as AuthenticatedRequest);
-                res.json(result);
+                res.status(201).json(result);
             }),
         },
         {

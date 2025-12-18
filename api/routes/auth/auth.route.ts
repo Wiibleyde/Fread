@@ -20,7 +20,7 @@ const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => 
             path: `${basePath}/callback`,
             handler: asyncHandler(async (_req, res) => {
                 const result = await controller.callback(_req);
-                res.json(result);
+                res.status(201).json(result);
             }),
         },
     ];

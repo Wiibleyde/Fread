@@ -1,12 +1,13 @@
 import cors from "cors";
 import express from "express";
 import { env } from "./env";
+import { errorMiddleware } from "./middleware/error";
 import accountRouter from "./routes/account";
 import authRouter from "./routes/auth";
 import followRouter from "./routes/follow";
 import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
-import { errorMiddleware } from "./middleware/error";
+import postRouter from "./routes/posts";
 
 const app = express();
 app.use(express.json());
@@ -20,9 +21,9 @@ app.use("/auth", authRouter);
 app.use("/test", testRouter);
 app.use("/account", accountRouter);
 app.use("/follow", followRouter);
+app.use("/posts", postRouter);
 
 app.use(errorMiddleware);
-
 
 app.listen(env.PORT, async () => {
     await dbHealthCheck();
