@@ -5,6 +5,7 @@ import InternalError from "../errors/internal.error";
 import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { deleteAccount, getAccountByIdDB } from "../services/account.service";
+import { getPostsByAccountId } from "../services/post.service";
 
 class AccountController {
     getProfile = async (req: Request) => {
@@ -43,6 +44,22 @@ class AccountController {
             throw new InternalError("Failed to delete account");
         }
     };
+
+    getPosts = async (req: Request) => {
+        const id = req.params.id;
+
+        if (!id) {
+            throw new BadRequestError("ID parameter is required");
+        }
+
+        try {
+            const posts = await getPostsByAccountId(id);
+            return { posts };
+        } catch (error) {
+            console.error("Error retrieving posts:", error);
+            throw new InternalError("Failed to retrieve posts");
+        }
+    }
 }
 
 export default AccountController;

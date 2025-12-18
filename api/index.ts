@@ -5,9 +5,9 @@ import { errorMiddleware } from "./middleware/error";
 import accountRouter from "./routes/account";
 import authRouter from "./routes/auth";
 import followRouter from "./routes/follow";
+import postRouter from "./routes/posts";
 import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
-import postRouter from "./routes/posts";
 
 const app = express();
 app.use(express.json());
@@ -21,7 +21,7 @@ app.use("/auth", authRouter);
 app.use("/test", testRouter);
 app.use("/account", accountRouter);
 app.use("/follow", followRouter);
-app.use("/posts", postRouter);
+app.use("/post", postRouter);
 
 app.use(errorMiddleware);
 

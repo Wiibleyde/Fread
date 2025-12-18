@@ -19,6 +19,14 @@ const createPostRoutes = (): RouteDescriptor[] => {
                 const result = await controller.createPost(req as AuthenticatedRequest);
                 res.status(201).json(result);
             })
+        },
+        {
+            method: "get",
+            path: "/:id",
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.getPost(req);
+                res.json(result);
+            })
         }
     ];
 }
