@@ -1,13 +1,17 @@
 import type { Request, Response } from "express";
+import BadRequestError from "../errors/badrequest.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { deleteAccount, getAccountByIdDB } from "../services/account.service";
+import UnauthorizedError from "../errors/unauthorized.error";
+import ForbiddenError from "../errors/forbidden.error";
+import InternalError from "../errors/internal.error";
 
 class AccountController {
     getProfile = async (req: Request, res: Response) => {
         const id = req.params.id;
 
         if (!id) {
-            return res.status(400).json({ error: "ID parameter is required" });
+            throw new BadRequestError("ID parameter is required");
         }
 
         const account = await getAccountByIdDB(id);
@@ -24,22 +28,20 @@ class AccountController {
         }
 
         if (!account) {
-            return res.status(401).json({ error: "Unauthorized" });
+            throw new UnauthorizedError();
         }
 
         if (account.id !== id) {
-            return res.status(403).json({ error: "Forbidden" });
+            throw new ForbiddenError("Cannot delete another user's account");
         }
 
-        console.log(`Deleting account with ID: ${account.id}`);
-        
         try {
             await deleteAccount(account.id);
+            res.json({ message: "Account deleted successfully" });
         } catch (error) {
             console.error("Error deleting account:", error);
-            return res.status(500).json({ error: "Internal server error" });
+            throw new InternalError("Failed to delete account");
         }
-        res.json({ message: "Account deleted successfully" });
     };
 }
 

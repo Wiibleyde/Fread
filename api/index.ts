@@ -6,6 +6,7 @@ import authRouter from "./routes/auth";
 import followRouter from "./routes/follow";
 import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
+import { errorMiddleware } from "./middleware/error";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,9 @@ app.use("/auth", authRouter);
 app.use("/test", testRouter);
 app.use("/account", accountRouter);
 app.use("/follow", followRouter);
+
+app.use(errorMiddleware);
+
 
 app.listen(env.PORT, async () => {
     await dbHealthCheck();
