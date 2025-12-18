@@ -1,6 +1,8 @@
 import FollowController from "../../controllers/follow.controller";
 import { authMiddleware } from "../../middleware/auth";
+import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
+import asyncHandler from "../../utils/handler";
 
 const createFollowRoutes = (): RouteDescriptor[] => {
 
@@ -10,18 +12,24 @@ const createFollowRoutes = (): RouteDescriptor[] => {
         {
             method: "post",
             path: "/:id",
-            handler: controller.followAccount,
             middlewares: [
                 authMiddleware
-            ]
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.followAccount(req as AuthenticatedRequest);
+                res.json(result);
+            }),
         },
         {
             method: "delete",
             path: "/:id",
-            handler: controller.unfullowAccount,
             middlewares: [
                 authMiddleware
-            ]
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.unfollowAccount(req as AuthenticatedRequest);
+                res.json(result);
+            }),
         }
     ];
 };

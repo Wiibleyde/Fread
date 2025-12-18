@@ -1,6 +1,7 @@
 import AccountController from "../../controllers/account.controller";
 import { authMiddleware } from "../../middleware/auth";
 import type { RouteDescriptor } from "../../models/route.model";
+import asyncHandler from "../../utils/handler";
 
 const createAccountRoutes = (): RouteDescriptor[] => {
     const controller = new AccountController();
@@ -9,15 +10,21 @@ const createAccountRoutes = (): RouteDescriptor[] => {
         {
             method: "get",
             path: "/:id",
-            handler: controller.getProfile,
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.getProfile(req);
+                res.json(result);
+            }),
         },
         {
             method: "delete",
             path: "/:id",
-            handler: controller.deleteAccount,
             middlewares: [
                 authMiddleware
-            ]
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.deleteAccount(req);
+                res.json(result);
+            })
         }
     ];
 

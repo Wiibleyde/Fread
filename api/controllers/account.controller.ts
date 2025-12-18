@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request } from "express";
 import BadRequestError from "../errors/badrequest.error";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
@@ -7,7 +7,7 @@ import type { AuthenticatedRequest } from "../models/auth.model";
 import { deleteAccount, getAccountByIdDB } from "../services/account.service";
 
 class AccountController {
-    getProfile = async (req: Request, res: Response) => {
+    getProfile = async (req: Request) => {
         const id = req.params.id;
 
         if (!id) {
@@ -16,15 +16,15 @@ class AccountController {
 
         const account = await getAccountByIdDB(id);
 
-        res.json({ account });
+        return { account };
     };
 
-    deleteAccount = async (req: AuthenticatedRequest, res: Response) => {
+    deleteAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
         const id = req.params.id;
 
         if (!id) {
-            return res.status(400).json({ error: "ID parameter is required" });
+            throw new BadRequestError("ID parameter is required");
         }
 
         if (!account) {
@@ -37,7 +37,7 @@ class AccountController {
 
         try {
             await deleteAccount(account.id);
-            res.json({ message: "Account deleted successfully" });
+            return { deleted: true, message: "Account deleted successfully" };
         } catch (error) {
             console.error("Error deleting account:", error);
             throw new InternalError("Failed to delete account");

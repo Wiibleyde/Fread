@@ -1,4 +1,3 @@
-import type { Response } from "express";
 import BadRequestError from "../errors/badrequest.error";
 import InternalError from "../errors/internal.error";
 import UnauthorizedError from "../errors/unauthorized.error";
@@ -6,7 +5,7 @@ import type { AuthenticatedRequest } from "../models/auth.model";
 import { followAccountDB, unfollowAccount } from "../services/follow.service";
 
 class FollowController {
-    followAccount = async (req: AuthenticatedRequest, res: Response) => {
+    followAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
         const idToFollow = req.params.id;
 
@@ -24,15 +23,13 @@ class FollowController {
 
         try {
             await followAccountDB(account.id, idToFollow);
-            res.json({
-                message: `Successfully followed account with ID: ${idToFollow}`,
-            });
+            return { followed: true, message: `Successfully followed account with ID: ${idToFollow}` };
         } catch (_error) {
             throw new InternalError();
         }
     };
 
-    unfullowAccount = async (req: AuthenticatedRequest, res: Response) => {
+    unfollowAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
         const idToUnfollow = req.params.id;
 
@@ -50,9 +47,7 @@ class FollowController {
 
         try {
             await unfollowAccount(account.id, idToUnfollow);
-            res.json({
-                message: `Successfully unfollowed account with ID: ${idToUnfollow}`,
-            });
+            return { unfollowed: true, message: `Successfully unfollowed account with ID: ${idToUnfollow}` };
         } catch (_error) {
             throw new InternalError();
         }
