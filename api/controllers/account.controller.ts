@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import BadRequestError from "../errors/badrequest.error";
-import type { AuthenticatedRequest } from "../models/auth.model";
-import { deleteAccount, getAccountByIdDB } from "../services/account.service";
-import UnauthorizedError from "../errors/unauthorized.error";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
+import UnauthorizedError from "../errors/unauthorized.error";
+import type { AuthenticatedRequest } from "../models/auth.model";
+import { deleteAccount, getAccountByIdDB } from "../services/account.service";
 
 class AccountController {
     getProfile = async (req: Request, res: Response) => {
