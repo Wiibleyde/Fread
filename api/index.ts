@@ -5,6 +5,7 @@ import { errorMiddleware } from "./middleware/error";
 import accountRouter from "./routes/account";
 import authRouter from "./routes/auth";
 import followRouter from "./routes/follow";
+import likeRouter from "./routes/like";
 import postRouter from "./routes/posts";
 import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
@@ -22,6 +23,7 @@ app.use("/test", testRouter);
 app.use("/account", accountRouter);
 app.use("/follow", followRouter);
 app.use("/post", postRouter);
+app.use("/like", likeRouter);
 
 app.use(errorMiddleware);
 
