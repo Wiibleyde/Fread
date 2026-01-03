@@ -18,13 +18,12 @@ app.get("/status", (_req, res) => {
     res.json({ status: "ok" });
 });
 
-app.use("/auth", authRouter);
-app.use("/test", testRouter);
-app.use("/account", accountRouter);
-app.use("/follow", followRouter);
-app.use("/post", postRouter);
-app.use("/like", likeRouter);
-
+app.use(authRouter);
+app.use(testRouter);
+app.use(accountRouter);
+app.use(followRouter);
+app.use(postRouter);
+app.use(likeRouter);
 app.use(errorMiddleware);
 
 app.listen(env.PORT, async () => {

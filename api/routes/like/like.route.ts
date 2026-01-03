@@ -7,11 +7,12 @@ import asyncHandler from "../../utils/handler";
 const createLikeRoutes = (): RouteDescriptor[]  => {
 
     const controller = new LikeController();
+    const prefix = "/like";
 
     return [
         {
             method: "post",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],
@@ -22,7 +23,7 @@ const createLikeRoutes = (): RouteDescriptor[]  => {
         },
         {
             method: "delete",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],

@@ -7,11 +7,12 @@ import asyncHandler from "../../utils/handler";
 const createFollowRoutes = (): RouteDescriptor[] => {
 
     const controller = new FollowController();
+    const prefix = "/follow";
 
     return [
         {
             method: "post",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],
@@ -22,7 +23,7 @@ const createFollowRoutes = (): RouteDescriptor[] => {
         },
         {
             method: "delete",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],

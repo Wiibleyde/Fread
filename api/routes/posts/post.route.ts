@@ -7,11 +7,12 @@ import asyncHandler from "../../utils/handler";
 const createPostRoutes = (): RouteDescriptor[] => {
 
     const controller = new PostController();
+    const prefix = "/post";
 
     return [
         {
             method: "post",
-            path: "/",
+            path: `${prefix}/`,
             middlewares: [
                 authMiddleware
             ],
@@ -22,7 +23,7 @@ const createPostRoutes = (): RouteDescriptor[] => {
         },
         {
             method: "get",
-            path: "/:id",
+            path: `${prefix}/:id`,
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.getPost(req);
                 res.json(result);
@@ -30,7 +31,7 @@ const createPostRoutes = (): RouteDescriptor[] => {
         },
         {
             method: "delete",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],

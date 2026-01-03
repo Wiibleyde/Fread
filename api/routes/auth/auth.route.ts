@@ -4,12 +4,12 @@ import asyncHandler from "../../utils/handler";
 
 const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => {
     const controller = new AuthController(provider);
-    const basePath = `/${provider}`;
+    const prefix = `/auth/${provider}`;
 
     return [
         {
             method: "get",
-            path: `${basePath}`,
+            path: `${prefix}`,
             handler: asyncHandler(async (_req, res) => {
                 const result = controller.redirect();
                 res.status(200).json({ url: result });
@@ -17,7 +17,7 @@ const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => 
         },
         {
             method: "get",
-            path: `${basePath}/callback`,
+            path: `${prefix}/callback`,
             handler: asyncHandler(async (_req, res) => {
                 const result = await controller.callback(_req);
                 res.status(201).json(result);

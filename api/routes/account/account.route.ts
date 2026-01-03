@@ -5,11 +5,12 @@ import asyncHandler from "../../utils/handler";
 
 const createAccountRoutes = (): RouteDescriptor[] => {
     const controller = new AccountController();
+    const prefix = "/account";
 
     return [
         {
             method: "get",
-            path: "/:id",
+            path: `${prefix}/:id`,
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.getProfile(req);
                 res.json(result);
@@ -17,7 +18,7 @@ const createAccountRoutes = (): RouteDescriptor[] => {
         },
         {
             method: "delete",
-            path: "/:id",
+            path: `${prefix}/:id`,
             middlewares: [
                 authMiddleware
             ],
@@ -28,7 +29,7 @@ const createAccountRoutes = (): RouteDescriptor[] => {
         },
         {
             method: "get",
-            path: "/:id/posts",
+            path: `${prefix}/:id/posts`,
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.getPosts(req);
                 res.json(result);
