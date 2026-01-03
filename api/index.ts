@@ -7,7 +7,6 @@ import authRouter from "./routes/auth";
 import followRouter from "./routes/follow";
 import likeRouter from "./routes/like";
 import postRouter from "./routes/posts";
-import testRouter from "./routes/test";
 import { dbHealthCheck } from "./utils/db";
 
 const app = express();
@@ -19,7 +18,6 @@ app.get("/status", (_req, res) => {
 });
 
 app.use(authRouter);
-app.use(testRouter);
 app.use(accountRouter);
 app.use(followRouter);
 app.use(postRouter);
