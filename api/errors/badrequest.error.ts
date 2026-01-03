@@ -1,8 +1,8 @@
 import AppError from "./AppError";
 
 class BadRequestError extends AppError {
-  constructor(message = "Bad request") {
-    super(message, 400);
+  constructor(message = "Bad request", data?: Record<string, unknown>) {
+    super(message, 400, data);
   }
 }
 

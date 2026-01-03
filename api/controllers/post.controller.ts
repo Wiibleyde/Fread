@@ -11,18 +11,18 @@ class PostController {
         const { content, isPrivate } = req.body;
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { created: false });
         }
 
         if (!content || typeof content !== "string") {
-            throw new BadRequestError("Content is required and must be a string");
+            throw new BadRequestError("Content is required and must be a string", { created: false });
         }
 
         try {
             await createPostDB(content, account.id, Boolean(isPrivate));
         } catch (error) {
             console.error("Error creating post:", error);
-            throw new InternalError("Failed to create post");
+            throw new InternalError("Failed to create post", { created: false });
         }
 
         return { created: true, message: "Post created" };
@@ -32,15 +32,15 @@ class PostController {
         const id = req.params.id;
 
         if (!id) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { retrieved: false });
         }
 
         try {
             const post = await getPostById(id);
-            return post;
+            return { retrieved: true, post };
         } catch (error) {
             console.error("Error retrieving post:", error);
-            throw new InternalError("Failed to retrieve post");
+            throw new InternalError("Failed to retrieve post", { retrieved: false });
         }
     }
 
@@ -49,21 +49,21 @@ class PostController {
         const id = req.params.id;
 
         if (!id) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { deleted: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { deleted: false });
         }
 
         const post = await getPostById(id);
 
         if (!post) {
-            throw new BadRequestError("Post not found");
+            throw new BadRequestError("Post not found", { deleted: false });
         }
 
         if (post.accountId !== account.id) {
-            throw new UnauthorizedError("You are not authorized to delete this post");
+            throw new UnauthorizedError("You are not authorized to delete this post", { deleted: false });
         }
 
         try {
@@ -71,7 +71,7 @@ class PostController {
             return { deleted: true, message: "Post deleted" };
         } catch (error) {
             console.error("Error deleting post:", error);
-            throw new InternalError("Failed to delete post");
+            throw new InternalError("Failed to delete post", { deleted: false });
         }
     }
 }

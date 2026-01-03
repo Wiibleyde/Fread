@@ -12,12 +12,12 @@ class AccountController {
         const id = req.params.id;
 
         if (!id) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { retrieved: false });
         }
 
         const account = await getAccountByIdDB(id);
 
-        return { account };
+        return { account, retrieved: true };
     };
 
     deleteAccount = async (req: AuthenticatedRequest) => {
@@ -25,15 +25,15 @@ class AccountController {
         const id = req.params.id;
 
         if (!id) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { deleted: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { deleted: false });
         }
 
         if (account.id !== id) {
-            throw new ForbiddenError("Cannot delete another user's account");
+            throw new ForbiddenError("Cannot delete another user's account", { deleted: false });
         }
 
         try {
@@ -41,7 +41,7 @@ class AccountController {
             return { deleted: true, message: "Account deleted successfully" };
         } catch (error) {
             console.error("Error deleting account:", error);
-            throw new InternalError("Failed to delete account");
+            throw new InternalError("Failed to delete account", { deleted: false });
         }
     };
 
@@ -49,15 +49,15 @@ class AccountController {
         const id = req.params.id;
 
         if (!id) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { retrieved: false });
         }
 
         try {
             const posts = await getPostsByAccountId(id);
-            return { posts };
+            return { posts, retrieved: true };
         } catch (error) {
             console.error("Error retrieving posts:", error);
-            throw new InternalError("Failed to retrieve posts");
+            throw new InternalError("Failed to retrieve posts", { retrieved: false });
         }
     }
 }

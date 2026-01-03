@@ -12,20 +12,20 @@ class FollowController {
         const idToFollow = req.params.id;
 
         if (!idToFollow) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { followed: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { followed: false });
         }
 
         if (account.id === idToFollow) {
-            throw new BadRequestError("Cannot follow yourself");
+            throw new BadRequestError("Cannot follow yourself", { followed: false });
         }
 
         const targetAccount = await getAccountByIdDB(idToFollow);
         if (!targetAccount) {
-            throw new NotFoundError("Account to follow not found");
+            throw new NotFoundError("Account to follow not found", { followed: false });
         }
 
         try {
@@ -36,7 +36,7 @@ class FollowController {
             };
         } catch (_error) {
             console.error(_error);
-            throw new InternalError();
+            throw new InternalError("Failed to follow account", { followed: false });
         }
     };
 
@@ -45,15 +45,15 @@ class FollowController {
         const idToUnfollow = req.params.id;
 
         if (!idToUnfollow) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { unfollowed: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { unfollowed: false });
         }
 
         if (account.id === idToUnfollow) {
-            throw new BadRequestError("Cannot unfollow yourself");
+            throw new BadRequestError("Cannot unfollow yourself", { unfollowed: false });
         }
 
         try {
@@ -63,7 +63,7 @@ class FollowController {
                 message: `Successfully unfollowed account with ID: ${idToUnfollow}`,
             };
         } catch (_error) {
-            throw new InternalError();
+            throw new InternalError("Failed to unfollow account", { unfollowed: false });
         }
     };
 }

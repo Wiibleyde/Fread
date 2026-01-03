@@ -10,18 +10,18 @@ class LikeController {
         const postId = req.params.id;
 
         if (!postId) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { liked: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { liked: false });
         }
 
         try {
             await likePostDB(account.id, postId);
             return { liked: true, message: `Successfully liked post with ID: ${postId}` };
         } catch (_error) {
-            throw new InternalError();
+            throw new InternalError("Internal server error", { liked: false });
         }
     };
 
@@ -30,17 +30,17 @@ class LikeController {
         const postId = req.params.id;
 
         if (!postId) {
-            throw new BadRequestError("ID parameter is required");
+            throw new BadRequestError("ID parameter is required", { unliked: false });
         }
 
         if (!account) {
-            throw new UnauthorizedError();
+            throw new UnauthorizedError("Unauthorized", { unliked: false });
         }
 
         const isLiked = await isPostLikedByAccountDB(account.id, postId);
 
         if (!isLiked) {
-            throw new BadRequestError("Post is not liked by the account");
+            throw new BadRequestError("Post is not liked by the account", { unliked: false });
         }
 
         try {
@@ -48,7 +48,7 @@ class LikeController {
             return { unliked: true, message: `Successfully unliked post with ID: ${postId}` };
         } catch (_error) {
             console.error(_error);
-            throw new InternalError();
+            throw new InternalError("Internal server error", { unliked: false });
         }
     };
 }
