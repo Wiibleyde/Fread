@@ -1,0 +1,444 @@
+{
+	"info": {
+		"_postman_id": "41251352-f19d-4bd4-a6d9-00ee7355801f",
+		"name": "Fread",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46114460",
+		"_collection_link": "https://matsuel-6419297.postman.co/workspace/Matsuel's-Workspace~42fddde7-2e21-42a1-8ca0-f4a300f4c6a8/collection/46114460-41251352-f19d-4bd4-a6d9-00ee7355801f?action=share&source=collection_link&creator=46114460"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Discord",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/auth/discord",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"auth",
+								"discord"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Google",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/auth/google",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"auth",
+								"google"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Get Account By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/account/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"account",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjbgh40000009ky6km3l8gbs"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Posts  By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/account/:id/posts",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"account",
+								":id",
+								"posts"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjy8rhxg0000nxy6ohb67uta"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"token\" : {{jwt}}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/account/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"account",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjbghjkb00029ky6opsgtovi"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Follow",
+			"item": [
+				{
+					"name": "Follow Account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/follow/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"follow",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjbgh40000009ky6km3l8gbs"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/follow/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"follow",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjbgh40000009ky6km3l8gbs"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Create post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"test\",\n    \"isPrivate\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get post by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjy94inb0002g0y6bqfttfgj"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get post by id Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjy94inb0002g0y6bqfttfgj"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Like",
+			"item": [
+				{
+					"name": "Like Post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/like/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"like",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjy9f9930000hiy6hn98hp9j"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unlike Post",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/like/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"like",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmjy9f9930000hiy6hn98hp9j"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "localhost",
+			"type": "string"
+		},
+		{
+			"key": "port",
+			"value": "3001",
+			"type": "string"
+		},
+		{
+			"key": "jwt",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
