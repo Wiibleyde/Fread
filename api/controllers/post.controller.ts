@@ -3,7 +3,7 @@ import BadRequestError from "../errors/badrequest.error";
 import InternalError from "../errors/internal.error";
 import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
-import { createPostDB, getPostById } from "../services/post.service";
+import { createPostDB, deletePostByIdDb, getPostById } from "../services/post.service";
 
 class PostController {
     createPost = async (req: AuthenticatedRequest) => {
@@ -41,6 +41,37 @@ class PostController {
         } catch (error) {
             console.error("Error retrieving post:", error);
             throw new InternalError("Failed to retrieve post");
+        }
+    }
+
+    deletePost = async (req: AuthenticatedRequest) => {
+        const account = req.account;
+        const id = req.params.id;
+
+        if (!id) {
+            throw new BadRequestError("ID parameter is required");
+        }
+
+        if (!account) {
+            throw new UnauthorizedError();
+        }
+
+        const post = await getPostById(id);
+
+        if (!post) {
+            throw new BadRequestError("Post not found");
+        }
+
+        if (post.accountId !== account.id) {
+            throw new UnauthorizedError("You are not authorized to delete this post");
+        }
+
+        try {
+            await deletePostByIdDb(id);
+            return { deleted: true, message: "Post deleted" };
+        } catch (error) {
+            console.error("Error deleting post:", error);
+            throw new InternalError("Failed to delete post");
         }
     }
 }

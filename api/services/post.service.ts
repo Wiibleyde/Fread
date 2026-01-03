@@ -28,3 +28,11 @@ export const getPostById = (postId: string) => {
         }
     });
 }
+
+export const deletePostByIdDb = (postId: string) => {
+    return prisma.post.delete({
+        where: {
+            id: postId
+        }
+    });
+}

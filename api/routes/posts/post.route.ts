@@ -27,6 +27,17 @@ const createPostRoutes = (): RouteDescriptor[] => {
                 const result = await controller.getPost(req);
                 res.json(result);
             })
+        },
+        {
+            method: "delete",
+            path: "/:id",
+            middlewares: [
+                authMiddleware
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.deletePost(req as AuthenticatedRequest);
+                res.json(result);
+            })
         }
     ];
 }

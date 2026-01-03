@@ -12,7 +12,7 @@ const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => 
             path: `${basePath}`,
             handler: asyncHandler(async (_req, res) => {
                 const result = controller.redirect();
-                res.redirect(result);
+                res.status(200).json({ url: result });
             }),
         },
         {
