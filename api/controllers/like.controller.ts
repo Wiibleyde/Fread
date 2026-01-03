@@ -2,7 +2,7 @@ import BadRequestError from "../errors/badrequest.error";
 import InternalError from "../errors/internal.error";
 import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
-import { likePostDB, unlikePostDB } from "../services/like.service";
+import { isPostLikedByAccountDB, likePostDB, unlikePostDB } from "../services/like.service";
 
 class LikeController {
     likePost = async (req: AuthenticatedRequest) => {
@@ -37,10 +37,17 @@ class LikeController {
             throw new UnauthorizedError();
         }
 
+        const isLiked = await isPostLikedByAccountDB(account.id, postId);
+
+        if (!isLiked) {
+            throw new BadRequestError("Post is not liked by the account");
+        }
+
         try {
             await unlikePostDB(account.id, postId);
             return { unliked: true, message: `Successfully unliked post with ID: ${postId}` };
         } catch (_error) {
+            console.error(_error);
             throw new InternalError();
         }
     };

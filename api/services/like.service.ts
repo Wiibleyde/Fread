@@ -16,6 +16,18 @@ export const likePostDB = async (accountId: string, postId: string): Promise<voi
     });
 };
 
+export const isPostLikedByAccountDB = async (accountId: string, postId: string): Promise<boolean> => {
+    const like = await prisma.like.findUnique({
+        where: {
+            accountId_postId: {
+                accountId,
+                postId,
+            }
+        }
+    });
+    return !!like;
+};
+
 
 export const unlikePostDB = async (accountId: string, postId: string): Promise<void> => {
     await prisma.like.delete({
