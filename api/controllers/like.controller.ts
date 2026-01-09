@@ -1,6 +1,5 @@
 import BadRequestError from "../errors/badrequest.error";
 import InternalError from "../errors/internal.error";
-import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { isPostLikedByAccountDB, likePostDB, unlikePostDB } from "../services/like.service";
 
@@ -11,10 +10,6 @@ class LikeController {
 
         if (!postId) {
             throw new BadRequestError("ID parameter is required", { liked: false });
-        }
-
-        if (!account) {
-            throw new UnauthorizedError("Unauthorized", { liked: false });
         }
 
         try {
@@ -31,10 +26,6 @@ class LikeController {
 
         if (!postId) {
             throw new BadRequestError("ID parameter is required", { unliked: false });
-        }
-
-        if (!account) {
-            throw new UnauthorizedError("Unauthorized", { unliked: false });
         }
 
         const isLiked = await isPostLikedByAccountDB(account.id, postId);

@@ -1,6 +1,29 @@
 import type { Request } from "express";
-import type { Account } from "../generated/prisma/client";
+import type { Prisma } from "../generated/prisma/client";
+
+export type AccountProfile = Prisma.AccountGetPayload<{
+    select: {
+        id: true;
+        username: true;
+        displayName: true;
+        description: true;
+        private: true;
+        createdAt: true;
+        profilePicture: {
+            select: {
+                id: true;
+                fileName: true;
+            };
+        };
+        follows: { select: { followedAccountId: true } };
+        followedBy: { select: { accountId: true } };
+    };
+}>;
 
 export interface AuthenticatedRequest extends Request {
-    account?: Account;
+    account: AccountProfile;
+}
+
+export interface PrivateResourceRequest extends Request {
+    account?: AccountProfile;
 }

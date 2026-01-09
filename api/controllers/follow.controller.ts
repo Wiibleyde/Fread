@@ -1,7 +1,6 @@
 import BadRequestError from "../errors/badrequest.error";
 import InternalError from "../errors/internal.error";
 import NotFoundError from "../errors/notfound.error";
-import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { getAccountByIdDB } from "../services/account.service";
 import { followAccountDB, unfollowAccount } from "../services/follow.service";
@@ -13,10 +12,6 @@ class FollowController {
 
         if (!idToFollow) {
             throw new BadRequestError("ID parameter is required", { followed: false });
-        }
-
-        if (!account) {
-            throw new UnauthorizedError("Unauthorized", { followed: false });
         }
 
         if (account.id === idToFollow) {
@@ -46,10 +41,6 @@ class FollowController {
 
         if (!idToUnfollow) {
             throw new BadRequestError("ID parameter is required", { unfollowed: false });
-        }
-
-        if (!account) {
-            throw new UnauthorizedError("Unauthorized", { unfollowed: false });
         }
 
         if (account.id === idToUnfollow) {

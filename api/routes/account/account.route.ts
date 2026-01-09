@@ -1,5 +1,6 @@
 import AccountController from "../../controllers/account.controller";
 import { authMiddleware } from "../../middleware/auth";
+import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
 
@@ -23,7 +24,7 @@ const createAccountRoutes = (): RouteDescriptor[] => {
                 authMiddleware
             ],
             handler: asyncHandler(async (req, res) => {
-                const result = await controller.deleteAccount(req);
+                const result = await controller.deleteAccount(req as AuthenticatedRequest);
                 res.json(result);
             })
         },

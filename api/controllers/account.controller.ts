@@ -2,7 +2,6 @@ import type { Request } from "express";
 import BadRequestError from "../errors/badrequest.error";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
-import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { deleteAccount, getAccountByIdDB } from "../services/account.service";
 import { getPostsByAccountId } from "../services/post.service";
@@ -26,10 +25,6 @@ class AccountController {
 
         if (!id) {
             throw new BadRequestError("ID parameter is required", { deleted: false });
-        }
-
-        if (!account) {
-            throw new UnauthorizedError("Unauthorized", { deleted: false });
         }
 
         if (account.id !== id) {

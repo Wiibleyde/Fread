@@ -1,5 +1,6 @@
 import PostController from "../../controllers/post.controller";
 import { authMiddleware } from "../../middleware/auth";
+import { optionalAuthMiddleware } from "../../middleware/optional-auth";
 import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
@@ -24,8 +25,11 @@ const createPostRoutes = (): RouteDescriptor[] => {
         {
             method: "get",
             path: `${prefix}/:id`,
+            middlewares: [
+                optionalAuthMiddleware
+            ],
             handler: asyncHandler(async (req, res) => {
-                const result = await controller.getPost(req);
+                const result = await controller.getPost(req as AuthenticatedRequest);
                 res.json(result);
             })
         },

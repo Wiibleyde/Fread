@@ -26,3 +26,15 @@ export const unfollowAccount = async (followerId: string, followedAccountId: str
         }
     });
 };
+
+export const isFollowing = async (followerId: string, followedAccountId: string) => {
+    const follow = await prisma.follow.findUnique({
+        where: {
+            accountId_followedAccountId: {
+                accountId: followerId,
+                followedAccountId: followedAccountId,
+            }
+        }
+    });
+    return !!follow;
+};
