@@ -11,7 +11,7 @@ const levelOrder: Record<Level, number> = {
 };
 
 function nowISO() {
-    return new Date().toISOString();
+    return new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" });
 }
 
 function normalizeModuleName(moduleUrl: string) {
