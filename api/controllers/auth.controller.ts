@@ -47,7 +47,7 @@ class AuthController {
             }
 
             const jwtToken = generateJWT(account);
-            logger.info("Generated JWT token for OAuth user");
+            logger.debug("Generated JWT token for OAuth user");
 
             return { token: jwtToken };
         } catch (error) {

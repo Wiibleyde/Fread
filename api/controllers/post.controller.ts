@@ -42,7 +42,7 @@ class PostController {
         }
 
         try {
-            logger.info("Retrieving post");
+            logger.debug("Retrieving post");
             const post = await getPostById(id);
 
             if (!post) {
@@ -53,7 +53,7 @@ class PostController {
             if (post.private) {
 
                 if (account && await isFollowing(account.id, post.accountId) && await isFollowing(post.accountId, account.id)) {
-                    logger.info("Post retrieved");
+                    logger.debug("Post retrieved");
                     return { retrieved: !!post, post };
                 }
                 // connecté mais pas de follow -> error

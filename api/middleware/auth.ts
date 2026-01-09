@@ -34,7 +34,7 @@ export const authMiddleware: RequestHandler = async (
         }
 
         (req as AuthenticatedRequest).account = account;
-        log.info("Authenticated request");
+        log.debug("Authenticated request");
         next();
     } catch (_err) {
         log.error("Auth middleware error");

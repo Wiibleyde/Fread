@@ -10,7 +10,7 @@ export function registerRoutes(
     const logger = Logger.for(import.meta.url);
 
     routes.forEach(route => {
-        logger.info(`Registering route [${route.method.toUpperCase()}] ${route.path}`);
+        logger.debug(`Registering route [${route.method.toUpperCase()}] ${route.path}`);
         router[route.method](
             route.path,
             ...(route.middlewares ?? []),

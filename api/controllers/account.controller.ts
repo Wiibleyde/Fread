@@ -20,7 +20,7 @@ class AccountController {
             throw new BadRequestError("ID parameter is required", { retrieved: false });
         }
 
-        logger.info("Retrieving profile");
+        logger.debug("Retrieving profile");
         const account = await getAccountByIdDB(id);
 
         return { account, retrieved: true };
@@ -60,7 +60,7 @@ class AccountController {
         }
 
         try {
-            logger.info("Retrieving posts for account");
+            logger.debug("Retrieving posts for account");
             const posts = await getPostsByAccountId(id);
             return { posts, retrieved: true };
         } catch (error) {

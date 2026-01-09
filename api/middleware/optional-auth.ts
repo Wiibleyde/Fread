@@ -34,8 +34,8 @@ export const optionalAuthMiddleware: RequestHandler = async (
             return next();
         }
 
-        (req as AuthenticatedRequest).account = account || undefined;
-        log.info("Authenticated in optional auth middleware");
+            (req as AuthenticatedRequest).account = account || undefined;
+            log.debug("Authenticated in optional auth middleware");
         next();
     } catch (_err) {
         log.warn("Optional auth middleware error; treating as guest");
