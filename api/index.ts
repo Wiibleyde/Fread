@@ -8,6 +8,9 @@ import followRouter from "./routes/follow";
 import likeRouter from "./routes/like";
 import postRouter from "./routes/posts";
 import { dbHealthCheck } from "./utils/db";
+import { Logger } from "./utils/logger";
+
+const logger = Logger.for(import.meta.url);
 
 const app = express();
 app.use(express.json());
@@ -26,5 +29,5 @@ app.use(errorMiddleware);
 
 app.listen(env.PORT, async () => {
     await dbHealthCheck();
-    console.log(`API server running on http://localhost:${env.PORT}`);
+    logger.info(`API server running on http://localhost:${env.PORT}`);
 });

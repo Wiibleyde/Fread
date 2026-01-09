@@ -2,6 +2,9 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { authenticateUser } from "../services/auth.service";
 import { verifyJWT } from "../utils/jwt";
 import type { AuthenticatedRequest } from "../models/auth.model";
+import { Logger } from "../utils/logger";
+
+const log = Logger.for(import.meta.url);
 
 export const authMiddleware: RequestHandler = async (
     req: Request,
@@ -12,24 +15,29 @@ export const authMiddleware: RequestHandler = async (
         const { token } = req.body;
 
         if (!token) {
-            return res.status(401).json({ error: "No token provided" });
+            log.warn("Auth failed: no token provided");
+            return res.status(401).json({ error: "Unauthorized" });
         }
 
         const payload = verifyJWT(token);
 
         if (!payload) {
-            return res.status(401).json({ error: "Invalid token" });
+            log.warn("Auth failed: invalid token");
+            return res.status(401).json({ error: "Unauthorized" });
         }
 
         const account = await authenticateUser(payload.id);
 
         if (!account) {
-            return res.status(401).json({ error: "User not found" });
+            log.warn("Auth failed: user not found for token subject");
+            return res.status(401).json({ error: "Unauthorized" });
         }
 
         (req as AuthenticatedRequest).account = account;
+        log.info("Authenticated request");
         next();
     } catch (_err) {
-        return res.status(401).json({ error: "Invalid or expired token" });
+        log.error("Auth middleware error");
+        return res.status(401).json({ error: "Unauthorized" });
     }
 };

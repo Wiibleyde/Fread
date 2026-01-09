@@ -9,6 +9,10 @@ import {
     getUserInfo,
 } from "../services/oauth.service";
 import { generateJWT } from "../utils/jwt";
+import { Logger } from "../utils/logger";
+
+const logger = Logger.for(import.meta.url);
+
 
 class AuthController {
     private provider: "discord" | "google";
@@ -18,6 +22,7 @@ class AuthController {
     }
 
     redirect = () => {
+        logger.info("Building auth URL");
         return buildAuthUrl(this.provider);
     };
 
@@ -37,16 +42,18 @@ class AuthController {
             let account = await getAccountByUsernameDB(userDatas.username);
 
             if (!account) {
+                logger.info("Creating new account from OAuth profile");
                 account = await createUser(userDatas);
             }
 
             const jwtToken = generateJWT(account);
+            logger.info("Generated JWT token for OAuth user");
 
             return { token: jwtToken };
         } catch (error) {
-            const errorMessage =
-                error instanceof Error ? error.message : String(error);
-            throw new InternalError(`Authentication failed: ${errorMessage}`);
+            logger.error("Authentication failed");
+            // Ne pas renvoyer le message interne au client pour éviter leaks
+            throw new InternalError();
         }
     };
 }
