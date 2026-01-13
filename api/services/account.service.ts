@@ -50,3 +50,20 @@ export const deleteAccount = (id: string) => {
         where: { id },
     });
 }
+
+interface EditAccountData {
+    displayName?: string;
+    description?: string | null;
+    private?: boolean;
+}
+
+export const editAccountDb = (id: string, data: EditAccountData) => {
+    return prisma.account.update({
+        where: { id },
+        data: {
+            displayName: data.displayName,
+            description: data.description || "",
+            private: data.private,
+        }
+    });
+}

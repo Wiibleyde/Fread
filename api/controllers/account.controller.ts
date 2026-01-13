@@ -3,7 +3,7 @@ import BadRequestError from "../errors/badrequest.error";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
-import { deleteAccount, getAccountByIdDB } from "../services/account.service";
+import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
 import { getPostsByAccountId } from "../services/post.service";
 import { Logger } from "../utils/logger";
 
@@ -66,6 +66,22 @@ class AccountController {
         } catch (error) {
             logger.error("Error retrieving posts");
             throw new InternalError("Failed to retrieve posts", { retrieved: false });
+        }
+    }
+
+    editAccount = async (req: AuthenticatedRequest) => {
+        const account = req.account;
+
+        const { displayName, description, isPrivate } = req.body;
+
+        try {
+            logger.info("Editing account");
+            await editAccountDb(account.id, { displayName, description, private: isPrivate });
+
+            return { edited: true, message: "Account edited successfully" };
+        } catch (error) {
+            logger.error("Error editing account");
+            throw new InternalError("Failed to edit account", { edited: false });
         }
     }
 }

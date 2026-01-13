@@ -35,6 +35,17 @@ const createAccountRoutes = (): RouteDescriptor[] => {
                 const result = await controller.getPosts(req);
                 res.json(result);
             }),
+        },
+        {
+            method: "patch",
+            path: `${prefix}`,
+            middlewares: [
+                authMiddleware
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.editAccount(req as AuthenticatedRequest);
+                res.json(result);
+            })
         }
     ];
 
