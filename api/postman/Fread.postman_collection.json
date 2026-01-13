@@ -74,7 +74,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjbgh40000009ky6km3l8gbs"
+									"value": "cmkd2ed96000272y6uxumc33k"
 								}
 							]
 						}
@@ -115,7 +115,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"token\" : {{jwt}}}",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -136,8 +136,36 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjbghjkb00029ky6opsgtovi"
+									"value": "cmkd2d4l2000072y6ogkdin2p"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch account",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtank4cmh4ZzAwMDBueHk2b2hiNjd1dGEiLCJ1c2VybmFtZSI6Im1hdHN1ZWwiLCJpYXQiOjE3NjgzMjYxODQsImV4cCI6MTc2ODkzMDk4NH0.QwqOfhcYCbSEE156qE9YWAfnywexVQ0f-ncIuSs474A\",\n    \"displayName\": \"Matheo Pang\",\n    \"description\": \"Test\",\n    \"isPrivate\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/account",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"account"
 							]
 						}
 					},
@@ -176,7 +204,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjbgh40000009ky6km3l8gbs"
+									"value": "cmkd2h2wk000472y69ue2gdbz",
+									"type": "text"
 								}
 							]
 						}
@@ -211,7 +240,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjbgh40000009ky6km3l8gbs"
+									"value": "cmkd2h2wk000472y69ue2gdbz"
 								}
 							]
 						}
@@ -230,7 +259,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"test\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"Bonjour à tous\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -261,7 +290,42 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\"token\": {{jwt}}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post/:id",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmkd2ju7n00008py69n0k3vym"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete post",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -290,13 +354,13 @@
 					"response": []
 				},
 				{
-					"name": "Get post by id Copy",
+					"name": "Patch Post",
 					"request": {
-						"method": "DELETE",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": {{jwt}},\n    \"content\": \"aaaaaa\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -317,7 +381,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjy94inb0002g0y6bqfttfgj"
+									"value": "cmkd2ju7n00008py69n0k3vym"
 								}
 							]
 						}
@@ -408,6 +472,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -418,6 +483,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -427,18 +493,15 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "localhost",
-			"type": "string"
+			"value": "localhost"
 		},
 		{
 			"key": "port",
-			"value": "3001",
-			"type": "string"
+			"value": "3001"
 		},
 		{
 			"key": "jwt",
-			"value": "",
-			"type": "string"
+			"value": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtank4cmh4ZzAwMDBueHk2b2hiNjd1dGEiLCJ1c2VybmFtZSI6Im1hdHN1ZWwiLCJpYXQiOjE3Njc0NDEwNDQsImV4cCI6MTc2ODA0NTg0NH0.zQbdGYbqDMW96Nf4pim8RJlb8NtVkqsPL_hh_l33d-Y\""
 		}
 	]
 }
