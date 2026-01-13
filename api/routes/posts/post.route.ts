@@ -1,9 +1,12 @@
 import PostController from "../../controllers/post.controller";
 import { authMiddleware } from "../../middleware/auth";
+import { validateBody, validateParams } from "../../middleware/validate";
 import { optionalAuthMiddleware } from "../../middleware/optional-auth";
 import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
+import { idParamSchema } from "../../schemas/common";
+import { postCreateSchema, postEditSchema } from "../../schemas/posts";
 
 const createPostRoutes = (): RouteDescriptor[] => {
 
@@ -15,7 +18,8 @@ const createPostRoutes = (): RouteDescriptor[] => {
             method: "post",
             path: `${prefix}/`,
             middlewares: [
-                authMiddleware
+                authMiddleware,
+                validateBody(postCreateSchema, "body")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.createPost(req as AuthenticatedRequest);
@@ -26,7 +30,8 @@ const createPostRoutes = (): RouteDescriptor[] => {
             method: "get",
             path: `${prefix}/:id`,
             middlewares: [
-                optionalAuthMiddleware
+                optionalAuthMiddleware,
+                validateParams(idParamSchema, "params")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.getPost(req as AuthenticatedRequest);
@@ -37,7 +42,8 @@ const createPostRoutes = (): RouteDescriptor[] => {
             method: "delete",
             path: `${prefix}/:id`,
             middlewares: [
-                authMiddleware
+                authMiddleware,
+                validateParams(idParamSchema, "params")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.deletePost(req as AuthenticatedRequest);
@@ -48,7 +54,9 @@ const createPostRoutes = (): RouteDescriptor[] => {
             method: "patch",
             path: `${prefix}/:id`,
             middlewares: [
-                authMiddleware
+                authMiddleware,
+                validateParams(idParamSchema, "params"),
+                validateBody(postEditSchema, "body")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.editPost(req as AuthenticatedRequest);

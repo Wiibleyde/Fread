@@ -3,6 +3,7 @@ import { authenticateUser } from "../services/auth.service";
 import { verifyJWT } from "../utils/jwt";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { Logger } from "../utils/logger";
+import UnauthorizedError from "../errors/unauthorized.error";
 
 const log = Logger.for(import.meta.url);
 
@@ -16,21 +17,21 @@ export const authMiddleware: RequestHandler = async (
 
         if (!token) {
             log.warn("Auth failed: no token provided");
-            return res.status(401).json({ error: "Unauthorized" });
+            return next(new UnauthorizedError("Unauthorized"));
         }
 
         const payload = verifyJWT(token);
 
         if (!payload) {
             log.warn("Auth failed: invalid token");
-            return res.status(401).json({ error: "Unauthorized" });
+            return next(new UnauthorizedError("Unauthorized"));
         }
 
         const account = await authenticateUser(payload.id);
 
         if (!account) {
             log.warn("Auth failed: user not found for token subject");
-            return res.status(401).json({ error: "Unauthorized" });
+            return next(new UnauthorizedError("Unauthorized"));
         }
 
         (req as AuthenticatedRequest).account = account;
@@ -38,6 +39,6 @@ export const authMiddleware: RequestHandler = async (
         next();
     } catch (_err) {
         log.error("Auth middleware error");
-        return res.status(401).json({ error: "Unauthorized" });
+        return next(new UnauthorizedError("Unauthorized"));
     }
 };

@@ -13,12 +13,7 @@ class FollowController {
 
     followAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const idToFollow = req.params.id;
-
-        if (!idToFollow) {
-            logger.warn("Follow account called without ID");
-            throw new BadRequestError("ID parameter is required", { followed: false });
-        }
+        const idToFollow = req.params.id!;
 
         if (account.id === idToFollow) {
             logger.warn("Attempted to follow oneself");
@@ -46,12 +41,7 @@ class FollowController {
 
     unfollowAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const idToUnfollow = req.params.id;
-
-        if (!idToUnfollow) {
-            logger.warn("Unfollow account called without ID");
-            throw new BadRequestError("ID parameter is required", { unfollowed: false });
-        }
+        const idToUnfollow = req.params.id!;
 
         if (account.id === idToUnfollow) {
             logger.warn("Attempted to unfollow oneself");

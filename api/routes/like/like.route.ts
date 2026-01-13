@@ -1,8 +1,10 @@
 import LikeController from "../../controllers/like.controller";
 import { authMiddleware } from "../../middleware/auth";
+import { validateParams } from "../../middleware/validate";
 import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
+import { idParamSchema } from "../../schemas/common";
 
 const createLikeRoutes = (): RouteDescriptor[]  => {
 
@@ -14,7 +16,8 @@ const createLikeRoutes = (): RouteDescriptor[]  => {
             method: "post",
             path: `${prefix}/:id`,
             middlewares: [
-                authMiddleware
+                authMiddleware,
+                validateParams(idParamSchema, "params")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.likePost(req as AuthenticatedRequest);
@@ -25,7 +28,8 @@ const createLikeRoutes = (): RouteDescriptor[]  => {
             method: "delete",
             path: `${prefix}/:id`,
             middlewares: [
-                authMiddleware
+                authMiddleware,
+                validateParams(idParamSchema, "params")
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.unlikePost(req as AuthenticatedRequest);

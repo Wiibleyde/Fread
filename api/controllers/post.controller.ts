@@ -3,6 +3,7 @@ import InternalError from "../errors/internal.error";
 import AppError from "../errors/AppError";
 import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
+import type { PostCreateBody, PostEditBody } from "../schemas/posts";
 import { createPostDB, deletePostByIdDb, editPostById, getPostById } from "../services/post.service";
 import { isFollowing } from "../services/follow.service";
 import NotFoundError from "../errors/notfound.error";
@@ -14,12 +15,7 @@ class PostController {
 
     createPost = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const { content, isPrivate } = req.body;
-
-        if (!content || typeof content !== "string") {
-            logger.warn("Create post with invalid content");
-            throw new BadRequestError("Content is required and must be a string", { created: false });
-        }
+        const { content, isPrivate } = req.body as PostCreateBody;
 
         try {
             logger.info("Creating post");
@@ -33,13 +29,8 @@ class PostController {
     }
 
     getPost = async (req: AuthenticatedRequest) => {
-        const id = req.params.id;
+        const id = req.params.id!;
         const account = req.account;
-
-        if (!id) {
-            logger.warn("Get post called without ID");
-            throw new BadRequestError("ID parameter is required", { retrieved: false });
-        }
 
         try {
             logger.debug("Retrieving post");
@@ -51,6 +42,11 @@ class PostController {
             }
 
             if (post.private) {
+
+                if (account && post.accountId === account.id) {
+                    logger.debug("Post retrieved");
+                    return { retrieved: !!post, post };
+                }
 
                 if (account && await isFollowing(account.id, post.accountId) && await isFollowing(post.accountId, account.id)) {
                     logger.debug("Post retrieved");
@@ -81,12 +77,7 @@ class PostController {
 
     deletePost = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const id = req.params.id;
-
-        if (!id) {
-            logger.warn("Delete post called without ID");
-            throw new BadRequestError("ID parameter is required", { deleted: false });
-        }
+        const id = req.params.id!;
 
         const post = await getPostById(id);
 
@@ -112,13 +103,8 @@ class PostController {
 
     editPost = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const id = req.params.id;
-        const { content, isPrivate } = req.body;
-
-        if (!id) {
-            logger.warn("Edit post called without ID");
-            throw new BadRequestError("ID parameter is required", { edited: false });
-        }
+        const id = req.params.id!;
+        const { content, isPrivate } = req.body as PostEditBody;
 
         const post = await getPostById(id);
 
@@ -133,7 +119,7 @@ class PostController {
         }
 
         try {
-            const updatedPost = await editPostById(id, content, isPrivate);
+            const updatedPost = await editPostById(id, content ?? post.content, isPrivate ?? post.private);
             logger.info("Post edited successfully");
             return { edited: true, post: updatedPost };
         } catch (error) {

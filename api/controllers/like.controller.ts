@@ -11,12 +11,7 @@ class LikeController {
 
     likePost = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const postId = req.params.id;
-
-        if (!postId) {
-            logger.warn("Like post called without ID");
-            throw new BadRequestError("ID parameter is required", { liked: false });
-        }
+        const postId = req.params.id!;
 
         try {
             logger.info("Liking post");
@@ -30,12 +25,7 @@ class LikeController {
 
     unlikePost = async (req: AuthenticatedRequest) => {
         const account = req.account;
-        const postId = req.params.id;
-
-        if (!postId) {
-            logger.warn("Unlike post called without ID");
-            throw new BadRequestError("ID parameter is required", { unliked: false });
-        }
+        const postId = req.params.id!;
 
         const isLiked = await isPostLikedByAccountDB(account.id, postId);
 

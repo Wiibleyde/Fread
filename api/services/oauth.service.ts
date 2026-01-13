@@ -35,10 +35,6 @@ export const buildAuthUrl = (provider: "discord" | "google"): string => {
 export const getCodeFromCallback = (req: Request): string => {
     const code = req.query.code as string;
 
-    if (!code) {
-        throw new BadRequestError("Code missing");
-    }
-
     return code;
 };
 

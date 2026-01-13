@@ -1,8 +1,8 @@
 import type { Request } from "express";
-import BadRequestError from "../errors/badrequest.error";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
+import type { AccountEditBody } from "../schemas/account";
 import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
 import { getPostsByAccountId } from "../services/post.service";
 import { Logger } from "../utils/logger";
@@ -13,12 +13,7 @@ const logger = Logger.for(import.meta.url);
 class AccountController {
 
     getProfile = async (req: Request) => {
-        const id = req.params.id;
-
-        if (!id) {
-            logger.warn("Get profile called without ID");
-            throw new BadRequestError("ID parameter is required", { retrieved: false });
-        }
+        const id = req.params.id!;
 
         logger.debug("Retrieving profile");
         const account = await getAccountByIdDB(id);
@@ -29,11 +24,6 @@ class AccountController {
     deleteAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
         const id = req.params.id;
-
-        if (!id) {
-            logger.warn("Delete account called without ID");
-            throw new BadRequestError("ID parameter is required", { deleted: false });
-        }
 
         if (account.id !== id) {
             logger.warn("Forbidden account deletion attempt");
@@ -52,12 +42,7 @@ class AccountController {
     };
 
     getPosts = async (req: Request) => {
-        const id = req.params.id;
-
-        if (!id) {
-            logger.warn("Get posts called without ID");
-            throw new BadRequestError("ID parameter is required", { retrieved: false });
-        }
+        const id = req.params.id!;
 
         try {
             logger.debug("Retrieving posts for account");
@@ -72,7 +57,7 @@ class AccountController {
     editAccount = async (req: AuthenticatedRequest) => {
         const account = req.account;
 
-        const { displayName, description, isPrivate } = req.body;
+        const { displayName, description, isPrivate } = req.body as AccountEditBody;
 
         try {
             logger.info("Editing account");
