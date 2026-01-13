@@ -43,6 +43,17 @@ const createPostRoutes = (): RouteDescriptor[] => {
                 const result = await controller.deletePost(req as AuthenticatedRequest);
                 res.json(result);
             })
+        }, 
+        {
+            method: "patch",
+            path: `${prefix}/:id`,
+            middlewares: [
+                authMiddleware
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.editPost(req as AuthenticatedRequest);
+                res.json(result);
+            })
         }
     ];
 }

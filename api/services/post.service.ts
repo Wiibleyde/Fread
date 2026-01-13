@@ -36,3 +36,15 @@ export const deletePostByIdDb = (postId: string) => {
         }
     });
 }
+
+export const editPostById = (postId: string, content: string, isPrivate: boolean) => {
+    return prisma.post.update({
+        where: {
+            id: postId
+        },
+        data: {
+            content,
+            private: isPrivate
+        }
+    });
+}

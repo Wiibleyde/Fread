@@ -3,7 +3,7 @@ import InternalError from "../errors/internal.error";
 import AppError from "../errors/AppError";
 import UnauthorizedError from "../errors/unauthorized.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
-import { createPostDB, deletePostByIdDb, getPostById } from "../services/post.service";
+import { createPostDB, deletePostByIdDb, editPostById, getPostById } from "../services/post.service";
 import { isFollowing } from "../services/follow.service";
 import NotFoundError from "../errors/notfound.error";
 import { Logger } from "../utils/logger";
@@ -107,6 +107,41 @@ class PostController {
         } catch (error) {
             logger.error("Error deleting post");
             throw new InternalError("Failed to delete post", { deleted: false });
+        }
+    }
+
+    editPost = async (req: AuthenticatedRequest) => {
+        const account = req.account;
+        const id = req.params.id;
+        const { content, isPrivate } = req.body;
+
+        if (!id) {
+            logger.warn("Edit post called without ID");
+            throw new BadRequestError("ID parameter is required", { edited: false });
+        }
+
+        const post = await getPostById(id);
+
+        if (!post) {
+            logger.warn("Post not found for editing");
+            throw new BadRequestError("Post not found", { edited: false });
+        }
+
+        if (post.accountId !== account.id) {
+            logger.warn("Unauthorized edit attempt for post");
+            throw new UnauthorizedError("You are not authorized to edit this post", { edited: false });
+        }
+
+        try {
+            const updatedPost = await editPostById(id, content, isPrivate);
+            logger.info("Post edited successfully");
+            return { edited: true, post: updatedPost };
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+            logger.error("Error editing post");
+            throw new InternalError("Failed to edit post", { edited: false });
         }
     }
 }
