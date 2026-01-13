@@ -23,7 +23,7 @@ class AccountController {
         logger.debug("Retrieving profile");
         const account = await getAccountByIdDB(id);
 
-        return { account, retrieved: true };
+        return { account, retrieved: !!account };
     };
 
     deleteAccount = async (req: AuthenticatedRequest) => {
@@ -62,7 +62,7 @@ class AccountController {
         try {
             logger.debug("Retrieving posts for account");
             const posts = await getPostsByAccountId(id);
-            return { posts, retrieved: true };
+            return { posts, retrieved: !!posts };
         } catch (error) {
             logger.error("Error retrieving posts");
             throw new InternalError("Failed to retrieve posts", { retrieved: false });
