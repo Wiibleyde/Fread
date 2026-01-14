@@ -38,3 +38,19 @@ export const isFollowing = async (followerId: string, followedAccountId: string)
     });
     return !!follow;
 };
+
+export const getFollowersCount = async (accountId: string) => {
+    return prisma.follow.count({
+        where: {
+            followedAccountId: accountId,
+        }
+    });
+};
+
+export const getFollowingCount = async (accountId: string) => {
+    return prisma.follow.count({
+        where: {
+            accountId: accountId,
+        }
+    });
+};

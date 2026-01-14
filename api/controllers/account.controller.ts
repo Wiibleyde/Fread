@@ -4,8 +4,9 @@ import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import type { AccountEditBody } from "../schemas/account";
 import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
-import { getPostsByAccountId } from "../services/post.service";
+import { getPostsByAccountId, getPostsCountByAccountId } from "../services/post.service";
 import { Logger } from "../utils/logger";
+import { getFollowersCount, getFollowingCount } from "../services/follow.service";
 
 const logger = Logger.for(import.meta.url);
 
@@ -17,8 +18,19 @@ class AccountController {
 
         logger.debug("Retrieving profile");
         const account = await getAccountByIdDB(id);
+        if (!account) {
+            return { account: null, retrieved: false };
+        }
 
-        return { account, retrieved: !!account };
+        return {
+            retrieved: !!account,
+            account: {
+                ...account,
+                postsCount: await getPostsCountByAccountId(account.id),
+                followingCount: await getFollowingCount(account.id),
+                followersCount: await getFollowersCount(account.id)
+            }
+        };
     };
 
     deleteAccount = async (req: AuthenticatedRequest) => {
@@ -47,7 +59,16 @@ class AccountController {
         try {
             logger.debug("Retrieving posts for account");
             const posts = await getPostsByAccountId(id);
-            return { posts, retrieved: !!posts };
+            const mappedPosts = posts.map(post => {
+                const { _count, ...rest } = post;
+                return {
+                    ...rest,
+                    likesCount: _count.likes,
+                    repliesCount: _count.replies
+                };
+            });
+
+            return { posts: mappedPosts, retrieved: posts.length > 0 };
         } catch (error) {
             logger.error("Error retrieving posts");
             throw new InternalError("Failed to retrieve posts", { retrieved: false });

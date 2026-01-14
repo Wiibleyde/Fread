@@ -26,21 +26,13 @@ export const getAccountByUsernameDB = (username: string) => {
 export const getAccountByIdDB = (id: string) => {
     return prisma.account.findUnique({
         where: { id },
-        select: {
-            id: true,
-            username: true,
-            displayName: true,
-            description: true,
-            private: true,
-            createdAt: true,
+        include: {
             profilePicture: {
                 select: {
                     id: true,
                     fileName: true
                 }
-            },
-            follows: { select: { followedAccountId: true } },
-            followedBy: { select: { accountId: true } },
+            }
         }
     });
 }
@@ -67,3 +59,4 @@ export const editAccountDb = (id: string, data: EditAccountData) => {
         }
     });
 }
+

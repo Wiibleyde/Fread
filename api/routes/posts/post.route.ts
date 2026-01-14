@@ -6,7 +6,7 @@ import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
 import { idParamSchema } from "../../schemas/common";
-import { postCreateSchema, postEditSchema } from "../../schemas/posts";
+import { postCreateSchema, postEditSchema, replyCreateSchema } from "../../schemas/posts";
 
 const createPostRoutes = (): RouteDescriptor[] => {
 
@@ -27,6 +27,19 @@ const createPostRoutes = (): RouteDescriptor[] => {
             })
         },
         {
+            method: "post",
+            path: `${prefix}/:id/reply`,
+            middlewares: [
+                authMiddleware,
+                validateParams(idParamSchema, "params"),
+                validateBody(replyCreateSchema, "body")
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.createReply(req as AuthenticatedRequest);
+                res.status(201).json(result);
+            })
+        },
+        {
             method: "get",
             path: `${prefix}/:id`,
             middlewares: [
@@ -35,6 +48,18 @@ const createPostRoutes = (): RouteDescriptor[] => {
             ],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.getPost(req as AuthenticatedRequest);
+                res.json(result);
+            })
+        },
+        {
+            method: "get",
+            path: `${prefix}/:id/replies`,
+            middlewares: [
+                optionalAuthMiddleware,
+                validateParams(idParamSchema, "params")
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.getReplies(req as AuthenticatedRequest);
                 res.json(result);
             })
         },
