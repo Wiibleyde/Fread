@@ -4,12 +4,11 @@ import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import type { AccountEditBody } from "../schemas/account";
 import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
-import { getPostsByAccountId, getPostsCountByAccountId } from "../services/post.service";
+import { getPostLikesCount, getPostRepliesCount, getPostsByAccountId, getPostsCountByAccountId } from "../services/post.service";
 import { Logger } from "../utils/logger";
 import { getFollowersCount, getFollowingCount } from "../services/follow.service";
 
 const logger = Logger.for(import.meta.url);
-
 
 class AccountController {
 
@@ -59,14 +58,13 @@ class AccountController {
         try {
             logger.debug("Retrieving posts for account");
             const posts = await getPostsByAccountId(id);
-            const mappedPosts = posts.map(post => {
-                const { _count, ...rest } = post;
+            const mappedPosts = await Promise.all(posts.map(async post => {
                 return {
-                    ...rest,
-                    likesCount: _count.likes,
-                    repliesCount: _count.replies
+                    ...post,
+                    likesCount: await getPostLikesCount(post.id),
+                    repliesCount: await getPostRepliesCount(post.id)
                 };
-            });
+            }));
 
             return { posts: mappedPosts, retrieved: posts.length > 0 };
         } catch (error) {

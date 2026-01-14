@@ -17,14 +17,6 @@ export const getPostsByAccountId = (accountId: string) => {
         },
         orderBy: {
             creationDate: "desc"
-        },
-        include: {
-            _count: {
-                select: {
-                    likes: true,
-                    replies: true
-                }
-            }
         }
     });
 }
