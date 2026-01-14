@@ -101,7 +101,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjy8rhxg0000nxy6ohb67uta"
+									"value": "cmkd2ed96000272y6uxumc33k"
 								}
 							]
 						}
@@ -205,7 +205,7 @@
 								{
 									"key": "id",
 									"value": "cmkd2h2wk000472y69ue2gdbz",
-									"type": "text"
+									"type": "string"
 								}
 							]
 						}
@@ -387,6 +387,81 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Reply to post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"Tu mens\",\n    \"isPrivate\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post/:id/reply",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post",
+								":id",
+								"reply"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmkeg50l700028sy6e8jos0nq"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get post replies",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/post/:id/replies",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"post",
+								":id",
+								"replies"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "cmkd2ju7n00008py69n0k3vym"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -421,7 +496,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjy9f9930000hiy6hn98hp9j"
+									"value": "cmkeg50l700028sy6e8jos0nq"
 								}
 							]
 						}
