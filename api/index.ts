@@ -9,6 +9,7 @@ import likeRouter from "./routes/like";
 import postRouter from "./routes/posts";
 import { dbHealthCheck } from "./utils/db";
 import { Logger } from "./utils/logger";
+import statusRouter from "./routes/status";
 
 const logger = Logger.for(import.meta.url);
 
@@ -16,16 +17,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/status", (_req, res) => {
-    res.json({ status: "ok" });
-});
-
 app.use(authRouter);
 app.use(accountRouter);
 app.use(followRouter);
 app.use(postRouter);
 app.use(likeRouter);
 app.use(errorMiddleware);
+app.use(statusRouter);
 
 app.listen(env.PORT, async () => {
     await dbHealthCheck();

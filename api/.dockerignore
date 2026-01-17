@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+yarn-error.log
+bun.lockb
+.git
+.gitignore
+Dockerfile
+README.md
+postman
+.tests
+coverage

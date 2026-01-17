@@ -1,8 +1,6 @@
 import AuthController from "../../controllers/auth.controller";
 import type { RouteDescriptor } from "../../models/route.model";
 import asyncHandler from "../../utils/handler";
-import { validateQuery } from "../../middleware/validate";
-import { authCallbackQuerySchema } from "../../schemas/auth";
 
 const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => {
     const controller = new AuthController(provider);
@@ -20,7 +18,6 @@ const createAuthRoutes = (provider: "discord" | "google"): RouteDescriptor[] => 
         {
             method: "get",
             path: `${prefix}/callback`,
-            middlewares: [validateQuery(authCallbackQuerySchema, "query")],
             handler: asyncHandler(async (req, res) => {
                 const result = await controller.callback(req);
                 res.status(201).json(result);

@@ -10,5 +10,27 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      # URL de connexion PostgreSQL (service "postgres" sur le réseau Docker)
+      DATABASE_URL: postgresql://root:RootPassword@postgres:5432/fread_db
+      # Port sur lequel l'API écoute (doit correspondre à EXPOSE dans le Dockerfile)
+      PORT: 3001
+      # À adapter avec de vraies valeurs en production
+      JWT_SECRET: "changeme-change-this-secret-key-32chars-min"
+      AUTH_DISCORD_ID: "changeme-123456789012345678"
+      AUTH_DISCORD_SECRET: "changeme-abcdefghijklmnopqrstuvwxyz"
+      DISCORD_REDIRECT_URI: "http://localhost:3001/auth/discord/callback"
+      AUTH_GOOGLE_ID: "changeme-123456789012-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com"
+      AUTH_GOOGLE_SECRET: "changeme-abcdefghijklmnopqrstuvwxyz"
+      GOOGLE_REDIRECT_URI: "http://localhost:3001/auth/google/callback"
+    ports:
+      - "3001:3001"
+
 volumes:
   postgres_data:
