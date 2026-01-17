@@ -74,7 +74,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2ed96000272y6uxumc33k"
+									"value": ""
 								}
 							]
 						}
@@ -101,7 +101,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2ed96000272y6uxumc33k"
+									"value": ""
 								}
 							]
 						}
@@ -115,7 +115,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -136,7 +136,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2d4l2000072y6ogkdin2p"
+									"value": ""
 								}
 							]
 						}
@@ -150,7 +150,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtank4cmh4ZzAwMDBueHk2b2hiNjd1dGEiLCJ1c2VybmFtZSI6Im1hdHN1ZWwiLCJpYXQiOjE3NjgzMjYxODQsImV4cCI6MTc2ODkzMDk4NH0.QwqOfhcYCbSEE156qE9YWAfnywexVQ0f-ncIuSs474A\",\n    \"displayName\": \"Matheo Pang\",\n    \"description\": \"Test\",\n    \"isPrivate\": true\n}",
+							"raw": "{\n    \"token\": \"\",\n    \"displayName\": \"\",\n    \"description\": \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -183,7 +183,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -204,7 +204,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2h2wk000472y69ue2gdbz",
+									"value": "",
 									"type": "string"
 								}
 							]
@@ -219,7 +219,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -240,7 +240,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2h2wk000472y69ue2gdbz"
+									"value": ""
 								}
 							]
 						}
@@ -259,7 +259,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"Bonjour à tous\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"token\": \"\",\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -290,7 +290,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"token\": {{jwt}}}",
+							"raw": "{\"token\": \"\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -311,7 +311,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2ju7n00008py69n0k3vym"
+									"value": ""
 								}
 							]
 						}
@@ -325,7 +325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -346,7 +346,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjy94inb0002g0y6bqfttfgj"
+									"value": ""
 								}
 							]
 						}
@@ -360,7 +360,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}},\n    \"content\": \"aaaaaa\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"token\": \"\",\n    \"content\": \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -381,7 +381,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2ju7n00008py69n0k3vym"
+									"value": ""
 								}
 							]
 						}
@@ -395,7 +395,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}},\n    \"content\" : \"Tu mens\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"token\": \"\",\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -417,7 +417,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkeg50l700028sy6e8jos0nq"
+									"value": ""
 								}
 							]
 						}
@@ -434,7 +434,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -456,7 +456,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkd2ju7n00008py69n0k3vym"
+									"value": ""
 								}
 							]
 						}
@@ -475,7 +475,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -496,7 +496,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmkeg50l700028sy6e8jos0nq"
+									"value": ""
 								}
 							]
 						}
@@ -510,7 +510,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": {{jwt}}\n}",
+							"raw": "{\n    \"token\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -531,7 +531,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "cmjy9f9930000hiy6hn98hp9j"
+									"value": ""
 								}
 							]
 						}
@@ -576,7 +576,7 @@
 		},
 		{
 			"key": "jwt",
-			"value": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtank4cmh4ZzAwMDBueHk2b2hiNjd1dGEiLCJ1c2VybmFtZSI6Im1hdHN1ZWwiLCJpYXQiOjE3Njc0NDEwNDQsImV4cCI6MTc2ODA0NTg0NH0.zQbdGYbqDMW96Nf4pim8RJlb8NtVkqsPL_hh_l33d-Y\""
+			"value": ""
 		}
 	]
 }

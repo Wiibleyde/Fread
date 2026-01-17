@@ -123,7 +123,7 @@ L'utilisateur non connecté pourra:
 
 ## Manuel utilisateur
 
-Le projet contient un manuel utilisateur permettant aux futurs utilisateurs de l'utiliser. Celui-ci s'appuie sur la collection Postman située dans `api/postman/Fread.postman_collection.json`, qui recense les principales routes de l'API, ainsi que les exemples de payloads et de configuration.
+Le projet contient un manuel utilisateur permettant aux futurs utilisateurs de l'utiliser. Une collection Postman dédiée à l'API est également fournie dans `api/postman/Fread.postman_collection.json` pour faciliter les tests des différentes routes. Celle-ci recense les principales routes de l'API, ainsi que les exemples de payloads et de configuration.
 
 ### Base de l'API et variables
 
