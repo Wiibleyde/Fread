@@ -1,5 +1,15 @@
 # Fread (Better than Thread)
 
+## Sommaire
+
+- [Description du projet](#description-du-projet)
+- [Description technique du projet](#description-technique-du-projet)
+- [Instructions d'installation](#instructions-dinstallation)
+- [Utilisation](#utilisation)
+- [Définition du besoin utilisateur](#definition-du-besoin-utilisateur)
+- [Structure du projet](#structure-du-projet)
+- [Manuel technique pour les développeurs](#manuel-technique-pour-les-developpeurs)
+
 ## Description du projet
 
 Fread est une application de réseau social qui permet aux utilisateurs de partager des postes, d'interagir avec le contenu des autres utilisateurs, et de construire une communauté en ligne. Inspirée par des plateformes populaires (Threads), Fread vise à offrir une expérience utilisateur fluide et engageante, en mettant l'accent sur la simplicité et l'accessibilité.
@@ -11,6 +21,21 @@ Notre projet permet aux utilisateurs de:
 - Liker et commenter les postes
 - S'abonner à d'autres utilisateurs
 - Créer et personnaliser leur profil utilisateur
+
+## Description technique du projet
+
+Une description technique du projet est disponible : langage utilisé, frameworks/librairies principaux, dépendances externes (s'il y a).
+
+- **Langage** : TypeScript exécuté côté serveur avec Node.js (runtime Bun en développement pour l'API).
+- **Frameworks / librairies principaux** :
+  - Express.js pour le serveur HTTP et la gestion des routes REST.
+  - Prisma comme ORM pour interagir avec la base PostgreSQL.
+  - Zod pour la validation des données.
+  - JSON Web Tokens (JWT) pour l'authentification et la gestion des sessions.
+  - Jest / ts-jest pour les tests unitaires.
+- **Dépendances externes** :
+  - Base de données PostgreSQL (démarrée typiquement via Docker Compose).
+  - Outils de développement : Bun pour la gestion des scripts et des dépendances.
 
 ## Instructions d'installation
 
