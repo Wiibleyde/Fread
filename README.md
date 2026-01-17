@@ -8,6 +8,7 @@
 - [Utilisation](#utilisation)
 - [Définition du besoin utilisateur](#definition-du-besoin-utilisateur)
 - [Structure du projet](#structure-du-projet)
+- [Manuel utilisateur](#manuel-utilisateur)
 - [Manuel technique pour les développeurs](#manuel-technique-pour-les-developpeurs)
 
 ## Description du projet
@@ -62,6 +63,162 @@ L'utilisateur devra être connnecté pour:
 L'utilisateur non connecté pourra:
 - Voir les postes/commentaires publics
 - Consulter les profils publics
+
+## Manuel utilisateur
+
+Le projet contient un manuel utilisateur permettant aux futurs utilisateurs de l'utiliser. Celui-ci s'appuie sur la collection Postman située dans `api/postman/Fread.postman_collection.json`, qui recense les principales routes de l'API, ainsi que les exemples de payloads et de configuration.
+
+### Base de l'API et variables
+
+- URL de base : `http://localhost:3001` (variables Postman `host = localhost`, `port = 3001`).
+- Format des corps de requête : JSON (`Content-Type: application/json`).
+- Authentification : pour les routes protégées, un token JWT est attendu dans le corps JSON sous la forme :
+
+  ```json
+  {
+    "token": "<votre_jwt>"
+  }
+  ```
+
+La collection Postman définit une variable `jwt` qui peut être utilisée pour pré-remplir ce champ.
+
+### Routes principales et payloads utiles
+
+#### Authentification (Auth)
+
+- `GET /auth/discord`  
+  - Authentification : non requise (démarre le flux OAuth Discord).
+- `GET /auth/google`  
+  - Authentification : non requise (démarre le flux OAuth Google).
+
+Ces routes lancent le flux d'authentification via un fournisseur externe (à utiliser depuis un navigateur ou via Postman pour tester la redirection).
+
+#### Comptes (Account)
+
+- `GET /account/:id`
+  - Récupère les informations publiques d'un compte à partir de son identifiant.
+  - Authentification : non requise.
+- `GET /account/:id/posts`
+  - Récupère les posts publics d'un compte.
+  - Authentification : non requise.
+- `PATCH /account`
+  - Authentification : requise (token JWT dans le corps de la requête).
+  - Corps JSON attendu :
+
+    ```json
+    {
+      "token": "<votre_jwt>",
+      "displayName": "Nom à afficher",
+      "description": "Description du profil",
+      "isPrivate": false
+    }
+    ```
+
+- `DELETE /account/:id`
+  - Authentification : requise (token JWT dans le corps de la requête).
+  - Corps JSON minimal :
+
+    ```json
+    {
+      "token": "<votre_jwt>"
+    }
+    ```
+
+#### Suivi d'utilisateurs (Follow)
+
+- `POST /follow/:id` — Suivre un compte
+  - Authentification : requise (token JWT dans le corps de la requête).
+- `DELETE /follow/:id` — Ne plus suivre un compte
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+Corps JSON pour ces deux routes :
+
+```json
+{
+  "token": "<votre_jwt>"
+}
+```
+
+#### Posts (Post)
+
+- `POST /post` — Créer un post
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+  ```json
+  {
+    "token": "<votre_jwt>",
+    "content": "Contenu de mon post",
+    "isPrivate": false
+  }
+  ```
+
+- `GET /post/:id` — Obtenir un post
+  - Authentification : optionnelle.
+  - Sans token : accès invité aux contenus publics.  
+  - Avec token :
+
+  ```json
+  {
+    "token": "<votre_jwt>"
+  }
+  ```
+
+- `PATCH /post/:id` — Modifier un post
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+  ```json
+  {
+    "token": "<votre_jwt>",
+    "content": "Nouveau contenu",
+    "isPrivate": false
+  }
+  ```
+
+- `DELETE /post/:id` — Supprimer un post
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+  ```json
+  {
+    "token": "<votre_jwt>"
+  }
+  ```
+
+- `POST /post/:id/reply` — Répondre à un post
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+  ```json
+  {
+    "token": "<votre_jwt>",
+    "content": "Ma réponse",
+    "isPrivate": false
+  }
+  ```
+
+- `GET /post/:id/replies` — Récupérer les réponses à un post
+  - Authentification : optionnelle.  
+  - Sans token : accès invité aux réponses publiques.  
+  - Avec token :
+
+  ```json
+  {
+    "token": "<votre_jwt>"
+  }
+  ```
+
+#### Likes (Like)
+
+- `POST /like/:id` — Liker un post
+  - Authentification : requise (token JWT dans le corps de la requête).
+- `DELETE /like/:id` — Retirer son like
+  - Authentification : requise (token JWT dans le corps de la requête).
+
+Corps JSON attendu :
+
+```json
+{
+  "token": "<votre_jwt>"
+}
+```
 
 ## Manuel technique pour les développeurs
 
