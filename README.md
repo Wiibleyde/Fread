@@ -40,6 +40,53 @@ Une description technique du projet est disponible : langage utilisé, framework
 
 ## Instructions d'installation
 
+### Prérequis
+
+- Node.js / Bun pour le développement local.
+- PostgreSQL (local ou via Docker).
+- Docker et Docker Compose pour lancer l'API et la base de données en conteneurs.
+
+### Lancer l'API et la base de données avec Docker
+
+Le projet peut être lancé entièrement via Docker (API + base PostgreSQL) grâce au fichier `docker-compose.yml` à la racine.
+
+1. **Configurer les variables d'environnement dans `docker-compose.yml` (service `api`)** :
+
+  - `DATABASE_URL` : URL de connexion à PostgreSQL (par défaut `postgresql://root:RootPassword@postgres:5432/fread_db`, ne pas la modifier tant que vous utilisez la base fournie par le service `postgres`).
+  - `PORT` : port exposé par l'API (par défaut `3001`, mappé sur `localhost:3001`).
+  - `JWT_SECRET` : chaîne secrète utilisée pour signer les JWT (**à changer impérativement** en production, au moins 32 caractères).
+  - `AUTH_DISCORD_ID` / `AUTH_DISCORD_SECRET` / `DISCORD_REDIRECT_URI` : identifiants OAuth Discord et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Discord.
+  - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` / `GOOGLE_REDIRECT_URI` : identifiants OAuth Google et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Google.
+
+2. **Construire les images et démarrer les conteneurs** (depuis la racine du projet) :
+
+  ```bash
+  docker compose build
+  docker compose up -d
+  ```
+
+  Cela démarre :
+  - un conteneur `postgres` avec la base `fread_db` ;
+  - un conteneur `api` qui génère le client Prisma, applique les migrations puis lance l'API Express.
+
+3. **Vérifier que l'API est en ligne** :
+
+  ```bash
+  curl http://localhost:3001/status
+  ```
+
+  Vous devez obtenir une réponse JSON du type :
+
+  ```json
+  { "status": "ok", "timestamp": "2023-10-11T00:00:00.000Z" }
+  ```
+
+4. **Arrêter les conteneurs** :
+
+  ```bash
+  docker compose down
+  ```
+
 ## Utilisation
 
 ## Définition du besoin utilisateur
