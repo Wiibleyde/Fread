@@ -54,3 +54,49 @@ export const getFollowingCount = async (accountId: string) => {
         }
     });
 };
+
+export const getFollowersByAccountId = async (accountId: string) => {
+    return prisma.follow.findMany({
+        where: {
+            followedAccountId: accountId,
+        },
+        include: {
+            account: {
+                select: {
+                    id: true,
+                    username: true,
+                    displayName: true,
+                    profilePicture: {
+                        select: {
+                            id: true,
+                            fileName: true,
+                        }
+                    }
+                }
+            }
+        }
+    });
+};
+
+export const getFollowingByAccountId = async (accountId: string) => {
+    return prisma.follow.findMany({
+        where: {
+            accountId: accountId,
+        },
+        include: {
+            followedAccount: {
+                select: {
+                    id: true,
+                    username: true,
+                    displayName: true,
+                    profilePicture: {
+                        select: {
+                            id: true,
+                            fileName: true,
+                        }
+                    }
+                }
+            }
+        }
+    });
+}

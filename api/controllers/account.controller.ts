@@ -6,7 +6,7 @@ import type { AccountEditBody } from "../schemas/account";
 import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
 import { getPostLikesCount, getPostRepliesCount, getPostsByAccountId, getPostsCountByAccountId } from "../services/post.service";
 import { Logger } from "../utils/logger";
-import { getFollowersCount, getFollowingCount } from "../services/follow.service";
+import { getFollowersByAccountId, getFollowersCount, getFollowingByAccountId, getFollowingCount } from "../services/follow.service";
 
 const logger = Logger.for(import.meta.url);
 
@@ -27,7 +27,9 @@ class AccountController {
                 ...account,
                 postsCount: await getPostsCountByAccountId(account.id),
                 followingCount: await getFollowingCount(account.id),
-                followersCount: await getFollowersCount(account.id)
+                followersCount: await getFollowersCount(account.id),
+                followers: await getFollowersByAccountId(account.id),
+                follows: await getFollowingByAccountId(account.id),
             }
         };
     };

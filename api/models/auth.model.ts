@@ -15,8 +15,6 @@ export type AccountProfile = Prisma.AccountGetPayload<{
                 fileName: true;
             };
         };
-        follows: { select: { followedAccountId: true } };
-        followedBy: { select: { accountId: true } };
     };
 }>;
 
