@@ -1,27 +1,11 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { authenticateUser } from "../services/auth.service";
-import { verifyJWT } from "../utils/jwt";
+import { getTokenFromAuthorizationHeader, verifyJWT } from "../utils/jwt";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { Logger } from "../utils/logger";
 import UnauthorizedError from "../errors/unauthorized.error";
 
 const log = Logger.for(import.meta.url);
-
-const getTokenFromAuthorizationHeader = (req: Request): string | null => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-        return null;
-    }
-
-    const [scheme, token] = authHeader.split(" ");
-
-    if (!scheme || scheme.toLowerCase() !== "bearer" || !token) {
-        return null;
-    }
-
-    return token;
-};
 
 export const authMiddleware: RequestHandler = async (
     req: Request,

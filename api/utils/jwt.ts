@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import type { Account } from "../generated/prisma/client";
 import type { JWTPayload } from "../models/jwt.model";
+import type { Request } from "express";
 
 export const generateJWT = (user: Account): string => {
     const payload = {
@@ -23,4 +24,20 @@ export const verifyJWT = (token: string): JWTPayload | null => {
     } catch (_err) {
         return null;
     }
+};
+
+export const getTokenFromAuthorizationHeader = (req: Request): string | null => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return null;
+    }
+
+    const [scheme, token] = authHeader.split(" ");
+
+    if (!scheme || scheme.toLowerCase() !== "bearer" || !token) {
+        return null;
+    }
+
+    return token;
 };
