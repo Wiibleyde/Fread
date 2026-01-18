@@ -129,15 +129,13 @@ Le projet contient un manuel utilisateur permettant aux futurs utilisateurs de l
 
 - URL de base : `http://localhost:3001` (variables Postman `host = localhost`, `port = 3001`).
 - Format des corps de requête : JSON (`Content-Type: application/json`).
-- Authentification : pour les routes protégées, un token JWT est attendu dans le corps JSON sous la forme :
+- Authentification : pour les routes protégées, un token JWT doit être envoyé via l'en-tête HTTP `Authorization` :
 
-  ```json
-  {
-    "token": "<votre_jwt>"
-  }
+  ```text
+  Authorization: Bearer <votre_jwt>
   ```
 
-La collection Postman définit une variable `jwt` qui peut être utilisée pour pré-remplir ce champ.
+La collection Postman définit une variable `jwt` qui peut être utilisée pour pré-remplir cet en-tête, par exemple : `Bearer {{jwt}}`.
 
 ### Routes principales et payloads utiles
 
@@ -159,123 +157,141 @@ Ces routes lancent le flux d'authentification via un fournisseur externe (à uti
   - Récupère les posts publics d'un compte.
   - Authentification : non requise.
 - `PATCH /account`
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
   - Corps JSON attendu :
 
     ```json
     {
-      "token": "<votre_jwt>",
       "displayName": "Nom à afficher",
       "description": "Description du profil",
       "isPrivate": false
     }
     ```
 
-- `DELETE /account/:id`
-  - Authentification : requise (token JWT dans le corps de la requête).
-  - Corps JSON minimal :
+  - Exemple d'en-tête :
 
-    ```json
-    {
-      "token": "<votre_jwt>"
-    }
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
+
+- `DELETE /account/:id`
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
+  - Aucun champ spécifique attendu dans le corps (éventuellement `{}`).
+
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
     ```
 
 #### Suivi d'utilisateurs (Follow)
 
 - `POST /follow/:id` — Suivre un compte
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 - `DELETE /follow/:id` — Ne plus suivre un compte
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 
-Corps JSON pour ces deux routes :
+  - Aucun champ spécifique attendu dans le corps (éventuellement `{}`).
 
-```json
-{
-  "token": "<votre_jwt>"
-}
-```
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
 
 #### Posts (Post)
 
 - `POST /post` — Créer un post
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 
   ```json
   {
-    "token": "<votre_jwt>",
     "content": "Contenu de mon post",
     "isPrivate": false
   }
   ```
 
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
+
 - `GET /post/:id` — Obtenir un post
   - Authentification : optionnelle.
-  - Sans token : accès invité aux contenus publics.  
-  - Avec token :
+  - Sans en-tête `Authorization` : accès invité aux contenus publics.  
+  - Avec en-tête `Authorization` :
 
-  ```json
-  {
-    "token": "<votre_jwt>"
-  }
-  ```
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
 
 - `PATCH /post/:id` — Modifier un post
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 
   ```json
   {
-    "token": "<votre_jwt>",
     "content": "Nouveau contenu",
     "isPrivate": false
   }
   ```
 
-- `DELETE /post/:id` — Supprimer un post
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Exemple d'en-tête :
 
-  ```json
-  {
-    "token": "<votre_jwt>"
-  }
-  ```
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
+
+- `DELETE /post/:id` — Supprimer un post
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
+
+  - Aucun champ spécifique attendu dans le corps (éventuellement `{}`).
+
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
 
 - `POST /post/:id/reply` — Répondre à un post
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 
   ```json
   {
-    "token": "<votre_jwt>",
     "content": "Ma réponse",
     "isPrivate": false
   }
   ```
 
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
+
 - `GET /post/:id/replies` — Récupérer les réponses à un post
   - Authentification : optionnelle.  
-  - Sans token : accès invité aux réponses publiques.  
-  - Avec token :
+  - Sans en-tête `Authorization` : accès invité aux réponses publiques.  
+  - Avec en-tête `Authorization` :
 
-  ```json
-  {
-    "token": "<votre_jwt>"
-  }
-  ```
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
 
 #### Likes (Like)
 
 - `POST /like/:id` — Liker un post
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 - `DELETE /like/:id` — Retirer son like
-  - Authentification : requise (token JWT dans le corps de la requête).
+  - Authentification : requise (token JWT dans l'en-tête `Authorization`).
 
-Corps JSON attendu :
+  - Aucun champ spécifique attendu dans le corps (éventuellement `{}`).
 
-```json
-{
-  "token": "<votre_jwt>"
-}
-```
+  - Exemple d'en-tête :
+
+    ```text
+    Authorization: Bearer <votre_jwt>
+    ```
 
 ## Manuel technique pour les développeurs
 
@@ -337,7 +353,7 @@ Principaux middlewares :
   - Vérifie sa validité et, en cas de succès, ajoute les informations utilisateur à l'objet `req` avant d'appeler `next()`.
   - En cas d'échec, renvoie une réponse `401 Unauthorized`.
 - **Authentification optionnelle (`middleware/optional-auth.ts`)** :
-  - Tente de décoder un éventuel JWT, mais laisse passer la requête même si aucun token n'est fourni.
+  - Tente de décoder un éventuel JWT présent dans l'en-tête `Authorization`, mais laisse passer la requête même si aucun token n'est fourni.
   - Utile pour les routes accessibles publiquement, mais personnalisables selon l'utilisateur connecté.
 - **Validation (`middleware/validate.ts`)** :
   - Utilise les schémas définis dans `schemas/` pour vérifier que les données envoyées (body, params, query) sont conformes.

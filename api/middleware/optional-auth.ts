@@ -6,6 +6,22 @@ import { Logger } from "../utils/logger";
 
 const log = Logger.for(import.meta.url);
 
+const getTokenFromAuthorizationHeader = (req: Request): string | null => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return null;
+    }
+
+    const [scheme, token] = authHeader.split(" ");
+
+    if (!scheme || scheme.toLowerCase() !== "bearer" || !token) {
+        return null;
+    }
+
+    return token;
+};
+
 
 export const optionalAuthMiddleware: RequestHandler = async (
     req: Request,
@@ -13,7 +29,7 @@ export const optionalAuthMiddleware: RequestHandler = async (
     next: NextFunction
 ) => {
     try {
-        const token = req.body?.token;
+        const token = getTokenFromAuthorizationHeader(req);
 
         if (!token) {
             log.debug("No token provided, proceeding as guest");
@@ -34,8 +50,8 @@ export const optionalAuthMiddleware: RequestHandler = async (
             return next();
         }
 
-            (req as AuthenticatedRequest).account = account || undefined;
-            log.debug("Authenticated in optional auth middleware");
+		(req as AuthenticatedRequest).account = account || undefined;
+		log.debug("Authenticated in optional auth middleware");
         next();
     } catch (_err) {
         log.warn("Optional auth middleware error; treating as guest");

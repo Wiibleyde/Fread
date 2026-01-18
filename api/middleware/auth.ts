@@ -7,16 +7,32 @@ import UnauthorizedError from "../errors/unauthorized.error";
 
 const log = Logger.for(import.meta.url);
 
+const getTokenFromAuthorizationHeader = (req: Request): string | null => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return null;
+    }
+
+    const [scheme, token] = authHeader.split(" ");
+
+    if (!scheme || scheme.toLowerCase() !== "bearer" || !token) {
+        return null;
+    }
+
+    return token;
+};
+
 export const authMiddleware: RequestHandler = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
-        const { token } = req.body;
+        const token = getTokenFromAuthorizationHeader(req);
 
         if (!token) {
-            log.warn("Auth failed: no token provided");
+            log.warn("Auth failed: no token provided in Authorization header");
             return next(new UnauthorizedError("Unauthorized"));
         }
 

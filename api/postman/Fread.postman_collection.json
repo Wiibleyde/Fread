@@ -112,10 +112,16 @@
 					"name": "Delete Account",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -147,10 +153,16 @@
 					"name": "Patch account",
 					"request": {
 						"method": "PATCH",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\",\n    \"displayName\": \"\",\n    \"description\": \"\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"displayName\": \"\",\n    \"description\": \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -180,10 +192,16 @@
 					"name": "Follow Account",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -216,10 +234,16 @@
 					"name": "Unfollow Account",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -256,10 +280,16 @@
 					"name": "Create post",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\",\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -287,16 +317,13 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"token\": \"\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
 							}
-						},
+						],
 						"url": {
 							"raw": "http://{{host}}:{{port}}/post/:id",
 							"protocol": "http",
@@ -322,10 +349,16 @@
 					"name": "Delete post",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -357,10 +390,16 @@
 					"name": "Patch Post",
 					"request": {
 						"method": "PATCH",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\",\n    \"content\": \"\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"content\": \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -392,10 +431,16 @@
 					"name": "Reply to post",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\",\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
+							"raw": "{\n    \"content\" : \"\",\n    \"isPrivate\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -431,16 +476,13 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
 							}
-						},
+						],
 						"url": {
 							"raw": "http://{{host}}:{{port}}/post/:id/replies",
 							"protocol": "http",
@@ -472,10 +514,16 @@
 					"name": "Like Post",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -507,10 +555,16 @@
 					"name": "Unlike Post",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"token\": \"\"\n}",
+							"raw": "{}",
 							"options": {
 								"raw": {
 									"language": "json"
