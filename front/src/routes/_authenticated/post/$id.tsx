@@ -1,13 +1,13 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
+import type { AxiosError } from "axios";
+import { useState } from "react";
 import { PostCard } from "@/components/PostCard";
 import { PrivatePostPlaceholder } from "@/components/PrivatePostPlaceholder";
-import { usePost } from "@/hooks/queries/usePost";
-import { useReplies } from "@/hooks/queries/useReplies";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateReply } from "@/hooks/mutations/usePost";
-import type { AxiosError } from "axios";
+import { usePost } from "@/hooks/queries/usePost";
+import { useReplies } from "@/hooks/queries/useReplies";
 
 export const Route = createFileRoute("/_authenticated/post/$id")({
 	component: PostDetailPage,

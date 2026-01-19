@@ -1,15 +1,13 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import type { QueryClient } from "@tanstack/react-query";
 import Header from "../components/Header";
 import { AuthProvider } from "../contexts/AuthContext";
-
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-
-import type { QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
 	queryClient: QueryClient;

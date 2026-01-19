@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import { Home, LogOut, Menu, User, X } from "lucide-react";
 import { useState } from "react";
-import { Home, Menu, X, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
@@ -18,6 +18,7 @@ export default function Header() {
 			<header className="p-4 flex items-center justify-between bg-white text-black shadow-md border-b border-black">
 				<div className="flex items-center">
 					<button
+						type="button"
 						onClick={() => setIsOpen(true)}
 						className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 						aria-label="Open menu"
@@ -41,6 +42,7 @@ export default function Header() {
 				<div className="flex items-center justify-between p-4 border-b border-black">
 					<h2 className="text-xl font-bold">Menu</h2>
 					<button
+						type="button"
 						onClick={() => setIsOpen(false)}
 						className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
 						aria-label="Close menu"
@@ -95,6 +97,7 @@ export default function Header() {
 							)}
 
 							<button
+								type="button"
 								onClick={handleLogout}
 								className="flex w-full items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mt-4"
 							>

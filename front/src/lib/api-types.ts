@@ -82,7 +82,7 @@ export interface EditPostResponse {
 	post: Post;
 }
 
-export type DeletePostRequest = {};
+export type DeletePostRequest = Record<string, never>;
 
 export interface DeletePostResponse {
 	deleted: boolean;
@@ -109,35 +109,35 @@ export interface EditAccountResponse {
 	message: string;
 }
 
-export type DeleteAccountRequest = {};
+export type DeleteAccountRequest = Record<string, never>;
 
 export interface DeleteAccountResponse {
 	deleted: boolean;
 	message: string;
 }
 
-export type FollowRequest = {};
+export type FollowRequest = Record<string, never>;
 
 export interface FollowResponse {
 	followed: boolean;
 	message: string;
 }
 
-export type UnfollowRequest = {};
+export type UnfollowRequest = Record<string, never>;
 
 export interface UnfollowResponse {
 	unfollowed: boolean;
 	message: string;
 }
 
-export type LikeRequest = {};
+export type LikeRequest = Record<string, never>;
 
 export interface LikeResponse {
 	liked: boolean;
 	message: string;
 }
 
-export type UnlikeRequest = {};
+export type UnlikeRequest = Record<string, never>;
 
 export interface UnlikeResponse {
 	unliked: boolean;

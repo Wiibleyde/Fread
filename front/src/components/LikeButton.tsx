@@ -1,7 +1,7 @@
 import { Heart } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLike, useUnlike } from "@/hooks/mutations/useLike";
-import { useState } from "react";
 
 interface LikeButtonProps {
 	postId: string;

@@ -1,5 +1,5 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { PostCard } from "@/components/PostCard";
 import { ProfileCard } from "@/components/ProfileCard";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,9 @@ export const Route = createFileRoute("/_authenticated/profile/$id")({
 function ProfilePage() {
 	const { id } = useParams({ from: "/_authenticated/profile/$id" });
 	const { userId } = useAuth();
+	const displayNameId = useId();
+	const descriptionId = useId();
+	const privateId = useId();
 	const { data: account, isLoading: accountLoading } = useAccount(id);
 	const { data: posts, isLoading: postsLoading } = useAccountPosts(id);
 	const [isEditing, setIsEditing] = useState(false);
@@ -78,9 +81,9 @@ function ProfilePage() {
 					<h2 className="mb-4 text-2xl font-bold">Edit Profile</h2>
 
 					<div className="mb-4">
-						<Label htmlFor="displayName">Display Name</Label>
+						<Label htmlFor={displayNameId}>Display Name</Label>
 						<Textarea
-							id="displayName"
+							id={displayNameId}
 							value={displayName}
 							onChange={(e) => setDisplayName(e.target.value)}
 							className="mt-2 border-black"
@@ -88,9 +91,9 @@ function ProfilePage() {
 					</div>
 
 					<div className="mb-4">
-						<Label htmlFor="description">Bio</Label>
+						<Label htmlFor={descriptionId}>Bio</Label>
 						<Textarea
-							id="description"
+							id={descriptionId}
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							className="mt-2 min-h-25 border-black"
@@ -100,11 +103,11 @@ function ProfilePage() {
 
 					<div className="mb-4 flex items-center gap-2">
 						<Switch
-							id="private"
+							id={privateId}
 							checked={isPrivate}
 							onCheckedChange={setIsPrivate}
 						/>
-						<Label htmlFor="private">Private account</Label>
+						<Label htmlFor={privateId}>Private account</Label>
 					</div>
 
 					<div className="flex gap-2">

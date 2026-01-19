@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreatePost } from "@/hooks/mutations/usePost";
 
 export function CreatePostForm() {
 	const [content, setContent] = useState("");
 	const [isPrivate, setIsPrivate] = useState(false);
 	const createPostMutation = useCreatePost();
+	const privateId = useId();
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -32,7 +33,7 @@ export function CreatePostForm() {
 					value={content}
 					onChange={(e) => setContent(e.target.value)}
 					placeholder="What's happening?"
-					className="min-h-[100px] resize-none border-black"
+					className="min-h-25 resize-none border-black"
 					maxLength={500}
 				/>
 				<div className="mt-2 text-right text-sm text-gray-600">
@@ -43,11 +44,11 @@ export function CreatePostForm() {
 			<div className="mb-4 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<Switch
-						id="private"
+						id={privateId}
 						checked={isPrivate}
 						onCheckedChange={setIsPrivate}
 					/>
-					<Label htmlFor="private" className="cursor-pointer">
+					<Label htmlFor={privateId} className="cursor-pointer">
 						Private post
 					</Label>
 				</div>

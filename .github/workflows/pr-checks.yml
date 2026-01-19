@@ -55,3 +55,24 @@ jobs:
             - name: Run tests
               working-directory: ./api
               run: bun test
+
+    biome-front:
+        name: Biome - Frontend
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install dependencies
+              working-directory: ./front
+              run: bun install
+
+            - name: Run Biome check
+              working-directory: ./front
+              run: bun run check

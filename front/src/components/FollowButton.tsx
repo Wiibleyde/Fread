@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFollow, useUnfollow } from "@/hooks/mutations/useFollow";
-import { useState } from "react";
 
 interface FollowButtonProps {
 	accountId: string;

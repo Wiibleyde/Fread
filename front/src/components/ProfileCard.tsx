@@ -1,7 +1,7 @@
 import { Lock } from "lucide-react";
-import { FollowButton } from "./FollowButton";
-import type { Account } from "@/lib/api-types";
 import { useAuth } from "@/hooks/useAuth";
+import type { Account } from "@/lib/api-types";
+import { FollowButton } from "./FollowButton";
 
 interface ProfileCardProps {
 	account: Account;
