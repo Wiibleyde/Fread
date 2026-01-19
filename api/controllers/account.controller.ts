@@ -13,7 +13,9 @@ import {
 	getFollowersCount,
 	getFollowingByAccountId,
 	getFollowingCount,
+	isFollowing,
 } from "../services/follow.service";
+import { isPostLikedByAccountDB } from "../services/like.service";
 import {
 	getPostLikesCount,
 	getPostRepliesCount,
@@ -25,8 +27,9 @@ import { Logger } from "../utils/logger";
 const logger = Logger.for(import.meta.url);
 
 class AccountController {
-	getProfile = async (req: Request) => {
+	getProfile = async (req: AuthenticatedRequest) => {
 		const id = req.params.id;
+		const viewerId = req.account?.id;
 
 		if (!id) {
 			return { account: null, retrieved: false };
@@ -38,6 +41,9 @@ class AccountController {
 			return { account: null, retrieved: false };
 		}
 
+		logger.debug(`Id: ${account.id}`, `ViewerId: ${viewerId}`);
+		logger.debug(viewerId ? await isFollowing(account.id, viewerId) : false);
+
 		return {
 			retrieved: !!account,
 			account: {
@@ -47,6 +53,7 @@ class AccountController {
 				followersCount: await getFollowersCount(account.id),
 				followers: await getFollowersByAccountId(account.id),
 				follows: await getFollowingByAccountId(account.id),
+				isFollowing: viewerId ? await isFollowing(account.id, viewerId) : false,
 			},
 		};
 	};
@@ -91,6 +98,9 @@ class AccountController {
 						...post,
 						likesCount: await getPostLikesCount(post.id),
 						repliesCount: await getPostRepliesCount(post.id),
+						isLiked: viewerId
+							? await isPostLikedByAccountDB(viewerId, post.id)
+							: false,
 					};
 				}),
 			);

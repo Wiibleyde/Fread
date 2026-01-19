@@ -8,6 +8,7 @@ export interface Account {
 	postsCount?: number;
 	followingCount?: number;
 	followersCount?: number;
+	isFollowing?: boolean;
 	createdAt: string;
 	updatedAt: string | null;
 }
@@ -20,6 +21,7 @@ export interface Post {
 	creationDate: string;
 	likesCount: number;
 	repliesCount: number;
+	isLiked?: boolean;
 }
 
 export interface File {

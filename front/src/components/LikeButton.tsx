@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLike, useUnlike } from "@/hooks/mutations/useLike";
 
@@ -17,6 +17,11 @@ export function LikeButton({
 	const [liked, setLiked] = useState(isLiked);
 	const likeMutation = useLike();
 	const unlikeMutation = useUnlike();
+
+	// Synchronize local state with prop when it changes (e.g., after refresh)
+	useEffect(() => {
+		setLiked(isLiked);
+	}, [isLiked]);
 
 	const handleClick = () => {
 		if (liked) {

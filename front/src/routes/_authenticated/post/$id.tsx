@@ -76,7 +76,7 @@ function PostDetailPage() {
 					value={replyContent}
 					onChange={(e) => setReplyContent(e.target.value)}
 					placeholder="Write your reply..."
-					className="mb-4 min-h-[100px] resize-none border-black"
+					className="mb-4 min-h-25 resize-none border-black"
 					maxLength={500}
 				/>
 				<div className="flex items-center justify-between">

@@ -16,9 +16,12 @@ const createAccountRoutes = (): RouteDescriptor[] => {
 		{
 			method: "get",
 			path: `${prefix}/:id`,
-			middlewares: [validateParams(idParamSchema, "params")],
+			middlewares: [
+				validateParams(idParamSchema, "params"),
+				optionalAuthMiddleware,
+			],
 			handler: asyncHandler(async (req, res) => {
-				const result = await controller.getProfile(req);
+				const result = await controller.getProfile(req as AuthenticatedRequest);
 				res.json(result);
 			}),
 		},

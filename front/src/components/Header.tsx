@@ -1,17 +1,27 @@
 import { Link } from "@tanstack/react-router";
 import { Home, LogOut, Menu, User, X } from "lucide-react";
 import { useState } from "react";
+import { useAccount } from "@/hooks/queries/useAccount";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { isAuthenticated, username, userId, logout } = useAuth();
+	const { data: account, isLoading, error } = useAccount(userId || "");
 
 	const handleLogout = () => {
 		logout();
 		setIsOpen(false);
 		window.location.href = "/login";
 	};
+
+	if (isLoading) {
+		return null;
+	}
+
+	if (error) {
+		return null;
+	}
 
 	return (
 		<>
@@ -29,8 +39,8 @@ export default function Header() {
 						<Link to="/">Fread</Link>
 					</h1>
 				</div>
-				{isAuthenticated && username && (
-					<div className="text-sm text-gray-600">@{username}</div>
+				{isAuthenticated && username && account && (
+					<div className="text-sm text-gray-600">{account.displayName}</div>
 				)}
 			</header>
 

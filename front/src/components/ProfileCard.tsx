@@ -18,7 +18,12 @@ export function ProfileCard({ account }: ProfileCardProps) {
 					<h1 className="text-2xl font-bold">{account.displayName}</h1>
 					<p className="text-gray-600">@{account.username}</p>
 				</div>
-				{!isOwnProfile && <FollowButton accountId={account.id} />}
+				{!isOwnProfile && (
+					<FollowButton
+						accountId={account.id}
+						isFollowing={account.isFollowing}
+					/>
+				)}
 			</div>
 
 			{account.description && (

@@ -10,6 +10,7 @@ import type {
 	ReplyCreateBody,
 } from "../schemas/posts";
 import { isFollowing } from "../services/follow.service";
+import { isPostLikedByAccountDB } from "../services/like.service";
 import {
 	createPostDB,
 	createReplyDB,
@@ -64,6 +65,7 @@ class PostController {
 							...post,
 							likesCount: await getPostLikesCount(post.id),
 							repliesCount: await getPostRepliesCount(post.id),
+							isLiked: await isPostLikedByAccountDB(account.id, post.id),
 						},
 					};
 				}
@@ -80,6 +82,7 @@ class PostController {
 							...post,
 							likesCount: await getPostLikesCount(post.id),
 							repliesCount: await getPostRepliesCount(post.id),
+							isLiked: await isPostLikedByAccountDB(account.id, post.id),
 						},
 					};
 				}
@@ -111,6 +114,9 @@ class PostController {
 				post: {
 					...post,
 					likesCount: await getPostLikesCount(post.id),
+					isLiked: account
+						? await isPostLikedByAccountDB(account.id, post.id)
+						: false,
 					repliesCount: await getPostRepliesCount(post.id),
 				},
 			};
@@ -261,6 +267,9 @@ class PostController {
 						...reply.replyPost,
 						likesCount: likeCount,
 						repliesCount: replyCount,
+						isLiked: account
+							? await isPostLikedByAccountDB(account.id, reply.replyPostId)
+							: false,
 					};
 				}),
 			);
@@ -296,6 +305,9 @@ class PostController {
 						...post,
 						likesCount: await getPostLikesCount(post.id),
 						repliesCount: await getPostRepliesCount(post.id),
+						isLiked: account
+							? await isPostLikedByAccountDB(account.id, post.id)
+							: false,
 					};
 				}),
 			);

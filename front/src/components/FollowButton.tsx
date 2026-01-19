@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useFollow, useUnfollow } from "@/hooks/mutations/useFollow";
 
@@ -14,6 +14,11 @@ export function FollowButton({
 	const [following, setFollowing] = useState(isFollowing);
 	const followMutation = useFollow();
 	const unfollowMutation = useUnfollow();
+
+	// Synchronize local state with prop when it changes (e.g., after refresh)
+	useEffect(() => {
+		setFollowing(isFollowing);
+	}, [isFollowing]);
 
 	const handleClick = () => {
 		if (following) {

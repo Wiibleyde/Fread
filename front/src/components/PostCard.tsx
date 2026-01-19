@@ -54,7 +54,11 @@ export function PostCard({ post, showReplies = true }: PostCardProps) {
 			</div>
 
 			<div className="mt-3 flex items-center gap-2 border-t border-gray-200 pt-3">
-				<LikeButton postId={post.id} likesCount={post.likesCount} />
+				<LikeButton
+					postId={post.id}
+					likesCount={post.likesCount}
+					isLiked={post.isLiked}
+				/>
 
 				{showReplies && (
 					<Link
