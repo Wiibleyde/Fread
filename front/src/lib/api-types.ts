@@ -64,7 +64,6 @@ export interface RepliesResponse {
 }
 
 export interface CreatePostRequest {
-	token: string;
 	content: string;
 	isPrivate?: boolean;
 }
@@ -75,7 +74,6 @@ export interface CreatePostResponse {
 }
 
 export interface EditPostRequest {
-	token: string;
 	content?: string;
 }
 
@@ -84,9 +82,7 @@ export interface EditPostResponse {
 	post: Post;
 }
 
-export interface DeletePostRequest {
-	token: string;
-}
+export type DeletePostRequest = {};
 
 export interface DeletePostResponse {
 	deleted: boolean;
@@ -94,7 +90,6 @@ export interface DeletePostResponse {
 }
 
 export interface CreateReplyRequest {
-	token: string;
 	content: string;
 }
 
@@ -104,7 +99,6 @@ export interface CreateReplyResponse {
 }
 
 export interface EditAccountRequest {
-	token: string;
 	displayName?: string;
 	description?: string | null;
 	isPrivate?: boolean;
@@ -115,45 +109,35 @@ export interface EditAccountResponse {
 	message: string;
 }
 
-export interface DeleteAccountRequest {
-	token: string;
-}
+export type DeleteAccountRequest = {};
 
 export interface DeleteAccountResponse {
 	deleted: boolean;
 	message: string;
 }
 
-export interface FollowRequest {
-	token: string;
-}
+export type FollowRequest = {};
 
 export interface FollowResponse {
 	followed: boolean;
 	message: string;
 }
 
-export interface UnfollowRequest {
-	token: string;
-}
+export type UnfollowRequest = {};
 
 export interface UnfollowResponse {
 	unfollowed: boolean;
 	message: string;
 }
 
-export interface LikeRequest {
-	token: string;
-}
+export type LikeRequest = {};
 
 export interface LikeResponse {
 	liked: boolean;
 	message: string;
 }
 
-export interface UnlikeRequest {
-	token: string;
-}
+export type UnlikeRequest = {};
 
 export interface UnlikeResponse {
 	unliked: boolean;

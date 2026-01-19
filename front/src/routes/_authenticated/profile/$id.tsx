@@ -1,14 +1,14 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { ProfileCard } from "@/components/ProfileCard";
-import { PostCard } from "@/components/PostCard";
-import { useAccount, useAccountPosts } from "@/hooks/queries/useAccount";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { PostCard } from "@/components/PostCard";
+import { ProfileCard } from "@/components/ProfileCard";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { useEditAccount } from "@/hooks/mutations/useAccount";
+import { useAccount, useAccountPosts } from "@/hooks/queries/useAccount";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/profile/$id")({
 	component: ProfilePage,
@@ -93,7 +93,7 @@ function ProfilePage() {
 							id="description"
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
-							className="mt-2 min-h-[100px] border-black"
+							className="mt-2 min-h-25 border-black"
 							maxLength={300}
 						/>
 					</div>

@@ -1,18 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { followApi } from "@/lib/api-client";
-import { queryKeys } from "@/lib/query-keys";
-import { storage } from "@/lib/storage";
 import { toast } from "react-toastify";
+import { followApi } from "@/lib/api-client";
 import type { Account } from "@/lib/api-types";
+import { queryKeys } from "@/lib/query-keys";
 
 export const useFollow = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (accountId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return followApi.follow(accountId, { token });
+			return followApi.follow(accountId, {});
 		},
 		onMutate: async (accountId) => {
 			await queryClient.cancelQueries({
@@ -61,9 +58,7 @@ export const useUnfollow = () => {
 
 	return useMutation({
 		mutationFn: async (accountId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return followApi.unfollow(accountId, { token });
+			return followApi.unfollow(accountId, {});
 		},
 		onMutate: async (accountId) => {
 			await queryClient.cancelQueries({

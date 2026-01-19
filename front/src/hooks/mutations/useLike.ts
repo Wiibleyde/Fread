@@ -1,18 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likeApi } from "@/lib/api-client";
-import { queryKeys } from "@/lib/query-keys";
-import { storage } from "@/lib/storage";
 import { toast } from "react-toastify";
+import { likeApi } from "@/lib/api-client";
 import type { Post } from "@/lib/api-types";
+import { queryKeys } from "@/lib/query-keys";
 
 export const useLike = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (postId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return likeApi.like(postId, { token });
+			return likeApi.like(postId, {});
 		},
 		onMutate: async (postId) => {
 			await queryClient.cancelQueries({
@@ -55,9 +52,7 @@ export const useUnlike = () => {
 
 	return useMutation({
 		mutationFn: async (postId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return likeApi.unlike(postId, { token });
+			return likeApi.unlike(postId, {});
 		},
 		onMutate: async (postId) => {
 			await queryClient.cancelQueries({

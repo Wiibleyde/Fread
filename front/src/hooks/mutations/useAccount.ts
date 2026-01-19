@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { accountApi } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import { storage } from "@/lib/storage";
-import { toast } from "react-toastify";
 
 export const useEditAccount = () => {
 	const queryClient = useQueryClient();
@@ -17,10 +17,7 @@ export const useEditAccount = () => {
 			description?: string | null;
 			isPrivate?: boolean;
 		}) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
 			return accountApi.editAccount({
-				token,
 				displayName,
 				description,
 				isPrivate,
@@ -41,9 +38,7 @@ export const useDeleteAccount = () => {
 
 	return useMutation({
 		mutationFn: async (accountId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return accountApi.deleteAccount(accountId, { token });
+			return accountApi.deleteAccount(accountId, {});
 		},
 		onSuccess: () => {
 			storage.clear();

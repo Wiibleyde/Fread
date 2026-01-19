@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { postApi } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
-import { storage } from "@/lib/storage";
-import { toast } from "react-toastify";
 
 export const useCreatePost = () => {
 	const queryClient = useQueryClient();
@@ -15,9 +14,7 @@ export const useCreatePost = () => {
 			content: string;
 			isPrivate?: boolean;
 		}) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return postApi.createPost({ token, content, isPrivate });
+			return postApi.createPost({ content, isPrivate });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
@@ -40,9 +37,7 @@ export const useEditPost = () => {
 			postId: string;
 			content: string;
 		}) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return postApi.editPost(postId, { token, content });
+			return postApi.editPost(postId, { content });
 		},
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({
@@ -62,9 +57,7 @@ export const useDeletePost = () => {
 
 	return useMutation({
 		mutationFn: async (postId: string) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return postApi.deletePost(postId, { token });
+			return postApi.deletePost(postId, {});
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
@@ -87,9 +80,7 @@ export const useCreateReply = () => {
 			postId: string;
 			content: string;
 		}) => {
-			const token = storage.getToken();
-			if (!token) throw new Error("Not authenticated");
-			return postApi.createReply(postId, { token, content });
+			return postApi.createReply(postId, { content });
 		},
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({
