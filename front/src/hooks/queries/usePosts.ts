@@ -2,15 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { accountApi } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 
-export const usePosts = (accountId?: string) => {
+export const usePosts = () => {
 	return useQuery({
-		queryKey: queryKeys.posts.list(accountId),
+		queryKey: queryKeys.posts.lists(),
 		queryFn: async () => {
-			if (accountId) {
-				const response = await accountApi.getAccountPosts(accountId);
-				return response.posts;
-			}
-			return [];
+			const response = await accountApi.getFeed();
+			return response.posts;
 		},
 		refetchInterval: 15000,
 	});

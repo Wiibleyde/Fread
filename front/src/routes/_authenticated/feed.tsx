@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router";
 import { CreatePostForm } from "@/components/CreatePostForm";
 import { PostCard } from "@/components/PostCard";
 import { usePosts } from "@/hooks/queries/usePosts";
@@ -42,5 +42,5 @@ function FeedPage() {
 				))}
 			</div>
 		</div>
-	)
+	);
 }

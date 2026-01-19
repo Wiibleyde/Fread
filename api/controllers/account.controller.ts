@@ -1,95 +1,125 @@
-import type { Request } from "express";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import type { AccountEditBody } from "../schemas/account";
-import { deleteAccount, editAccountDb, getAccountByIdDB } from "../services/account.service";
-import { getPostLikesCount, getPostRepliesCount, getPostsByAccountId, getPostsCountByAccountId } from "../services/post.service";
+import {
+	deleteAccount,
+	editAccountDb,
+	getAccountByIdDB,
+} from "../services/account.service";
+import {
+	getFollowersByAccountId,
+	getFollowersCount,
+	getFollowingByAccountId,
+	getFollowingCount,
+} from "../services/follow.service";
+import {
+	getPostLikesCount,
+	getPostRepliesCount,
+	getPostsByAccountId,
+	getPostsCountByAccountId,
+} from "../services/post.service";
 import { Logger } from "../utils/logger";
-import { getFollowersByAccountId, getFollowersCount, getFollowingByAccountId, getFollowingCount } from "../services/follow.service";
 
 const logger = Logger.for(import.meta.url);
 
 class AccountController {
+	getProfile = async (req: Request) => {
+		const id = req.params.id;
 
-    getProfile = async (req: Request) => {
-        const id = req.params.id!;
+		if (!id) {
+			return { account: null, retrieved: false };
+		}
 
-        logger.debug("Retrieving profile");
-        const account = await getAccountByIdDB(id);
-        if (!account) {
-            return { account: null, retrieved: false };
-        }
+		logger.debug("Retrieving profile");
+		const account = await getAccountByIdDB(id);
+		if (!account) {
+			return { account: null, retrieved: false };
+		}
 
-        return {
-            retrieved: !!account,
-            account: {
-                ...account,
-                postsCount: await getPostsCountByAccountId(account.id),
-                followingCount: await getFollowingCount(account.id),
-                followersCount: await getFollowersCount(account.id),
-                followers: await getFollowersByAccountId(account.id),
-                follows: await getFollowingByAccountId(account.id),
-            }
-        };
-    };
+		return {
+			retrieved: !!account,
+			account: {
+				...account,
+				postsCount: await getPostsCountByAccountId(account.id),
+				followingCount: await getFollowingCount(account.id),
+				followersCount: await getFollowersCount(account.id),
+				followers: await getFollowersByAccountId(account.id),
+				follows: await getFollowingByAccountId(account.id),
+			},
+		};
+	};
 
-    deleteAccount = async (req: AuthenticatedRequest) => {
-        const account = req.account;
-        const id = req.params.id;
+	deleteAccount = async (req: AuthenticatedRequest) => {
+		const account = req.account;
+		const id = req.params.id;
 
-        if (account.id !== id) {
-            logger.warn("Forbidden account deletion attempt");
-            throw new ForbiddenError("Cannot delete another user's account", { deleted: false });
-        }
+		if (account.id !== id) {
+			logger.warn("Forbidden account deletion attempt");
+			throw new ForbiddenError("Cannot delete another user's account", {
+				deleted: false,
+			});
+		}
 
-        try {
-            logger.info("Deleting account");
-            await deleteAccount(account.id);
+		try {
+			logger.info("Deleting account");
+			await deleteAccount(account.id);
 
-            return { deleted: true, message: "Account deleted successfully" };
-        } catch (error) {
-            logger.error("Error deleting account");
-            throw new InternalError("Failed to delete account", { deleted: false });
-        }
-    };
+			return { deleted: true, message: "Account deleted successfully" };
+		} catch {
+			logger.error("Error deleting account");
+			throw new InternalError("Failed to delete account", { deleted: false });
+		}
+	};
 
-    getPosts = async (req: Request) => {
-        const id = req.params.id!;
+	getPosts = async (req: AuthenticatedRequest) => {
+		const id = req.params.id;
 
-        try {
-            logger.debug("Retrieving posts for account");
-            const posts = await getPostsByAccountId(id);
-            const mappedPosts = await Promise.all(posts.map(async post => {
-                return {
-                    ...post,
-                    likesCount: await getPostLikesCount(post.id),
-                    repliesCount: await getPostRepliesCount(post.id)
-                };
-            }));
+		if (!id) {
+			throw new InternalError("Account ID is required", { retrieved: false });
+		}
 
-            return { posts: mappedPosts, retrieved: posts.length > 0 };
-        } catch (error) {
-            logger.error("Error retrieving posts");
-            throw new InternalError("Failed to retrieve posts", { retrieved: false });
-        }
-    }
+		const viewerId = req.account?.id;
 
-    editAccount = async (req: AuthenticatedRequest) => {
-        const account = req.account;
+		try {
+			logger.debug("Retrieving posts for account");
+			const posts = await getPostsByAccountId(id, viewerId);
+			const mappedPosts = await Promise.all(
+				posts.map(async (post) => {
+					return {
+						...post,
+						likesCount: await getPostLikesCount(post.id),
+						repliesCount: await getPostRepliesCount(post.id),
+					};
+				}),
+			);
 
-        const { displayName, description, isPrivate } = req.body as AccountEditBody;
+			return { posts: mappedPosts, retrieved: posts.length > 0 };
+		} catch {
+			logger.error("Error retrieving posts");
+			throw new InternalError("Failed to retrieve posts", { retrieved: false });
+		}
+	};
 
-        try {
-            logger.info("Editing account");
-            await editAccountDb(account.id, { displayName, description, private: isPrivate });
+	editAccount = async (req: AuthenticatedRequest) => {
+		const account = req.account;
 
-            return { edited: true, message: "Account edited successfully" };
-        } catch (error) {
-            logger.error("Error editing account");
-            throw new InternalError("Failed to edit account", { edited: false });
-        }
-    }
+		const { displayName, description, isPrivate } = req.body as AccountEditBody;
+
+		try {
+			logger.info("Editing account");
+			await editAccountDb(account.id, {
+				displayName,
+				description,
+				private: isPrivate,
+			});
+
+			return { edited: true, message: "Account edited successfully" };
+		} catch {
+			logger.error("Error editing account");
+			throw new InternalError("Failed to edit account", { edited: false });
+		}
+	};
 }
 
 export default AccountController;

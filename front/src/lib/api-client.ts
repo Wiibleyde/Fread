@@ -131,6 +131,11 @@ export const accountApi = {
 		const { data } = await apiClient.get<PostsResponse>(`/account/${id}/posts`);
 		return data;
 	},
+
+	getFeed: async (): Promise<PostsResponse> => {
+		const { data } = await apiClient.get<PostsResponse>("/post/feed");
+		return data;
+	},
 };
 
 export const postApi = {
