@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: RootPassword
+      POSTGRES_DB: fread_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    env_file:
+      - ./api/.env
+    environment:
+      # Override DATABASE_URL to use Docker service name instead of localhost
+      DATABASE_URL: postgresql://root:RootPassword@postgres:5432/fread_db
+    ports:
+      - "3001:3001"
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    env_file:
+      - ./front/.env.local
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:

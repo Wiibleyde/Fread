@@ -1,0 +1,42 @@
+import LikeController from "../../controllers/like.controller";
+import { authMiddleware } from "../../middleware/auth";
+import { validateParams } from "../../middleware/validate";
+import type { AuthenticatedRequest } from "../../models/auth.model";
+import type { RouteDescriptor } from "../../models/route.model";
+import asyncHandler from "../../utils/handler";
+import { idParamSchema } from "../../schemas/common";
+
+const createLikeRoutes = (): RouteDescriptor[]  => {
+
+    const controller = new LikeController();
+    const prefix = "/like";
+
+    return [
+        {
+            method: "post",
+            path: `${prefix}/:id`,
+            middlewares: [
+                authMiddleware,
+                validateParams(idParamSchema, "params")
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.likePost(req as AuthenticatedRequest);
+                res.status(201).json(result);
+            }),
+        },
+        {
+            method: "delete",
+            path: `${prefix}/:id`,
+            middlewares: [
+                authMiddleware,
+                validateParams(idParamSchema, "params")
+            ],
+            handler: asyncHandler(async (req, res) => {
+                const result = await controller.unlikePost(req as AuthenticatedRequest);
+                res.status(200).json(result);
+            })
+        }
+    ]
+}
+
+export default createLikeRoutes;
