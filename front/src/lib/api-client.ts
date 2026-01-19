@@ -222,6 +222,16 @@ export const followApi = {
 		);
 		return data;
 	},
+
+	getFollowers: async (accountId: string) => {
+		const { data } = await apiClient.get(`/follow/${accountId}/followers`);
+		return data;
+	},
+
+	getFollowed: async (accountId: string) => {
+		const { data } = await apiClient.get(`/follow/${accountId}/followed`);
+		return data;
+	},
 };
 
 export const likeApi = {

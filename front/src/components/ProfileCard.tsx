@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import type { Account } from "@/lib/api-types";
@@ -44,14 +45,22 @@ export function ProfileCard({ account }: ProfileCardProps) {
 					<span className="font-bold">{account.postsCount || 0}</span>
 					<span className="ml-1 text-gray-600">Posts</span>
 				</div>
-				<div>
+				<Link
+					to="/profile/$id/followed"
+					params={{ id: account.id }}
+					className="transition-opacity hover:opacity-70"
+				>
 					<span className="font-bold">{account.followingCount || 0}</span>
 					<span className="ml-1 text-gray-600">Following</span>
-				</div>
-				<div>
+				</Link>
+				<Link
+					to="/profile/$id/followers"
+					params={{ id: account.id }}
+					className="transition-opacity hover:opacity-70"
+				>
 					<span className="font-bold">{account.followersCount || 0}</span>
 					<span className="ml-1 text-gray-600">Followers</span>
-				</div>
+				</Link>
 			</div>
 		</div>
 	);

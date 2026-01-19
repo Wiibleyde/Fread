@@ -149,3 +149,13 @@ export interface UnlikeResponse {
 export interface OptionalAuthRequest {
 	token?: string;
 }
+
+export interface FollowersResponse {
+	followers: Account[];
+	count: number;
+}
+
+export interface FollowedResponse {
+	followed: Account[];
+	count: number;
+}

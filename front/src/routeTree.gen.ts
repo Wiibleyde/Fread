@@ -17,6 +17,9 @@ import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/cal
 import { Route as AuthDiscordCallbackRouteImport } from './routes/auth/discord/callback'
 import { Route as AuthenticatedProfileIdRouteImport } from './routes/_authenticated/profile/$id'
 import { Route as AuthenticatedPostIdRouteImport } from './routes/_authenticated/post/$id'
+import { Route as AuthenticatedProfileIdIndexRouteImport } from './routes/_authenticated/profile/$id/index'
+import { Route as AuthenticatedProfileIdFollowersRouteImport } from './routes/_authenticated/profile/$id/followers'
+import { Route as AuthenticatedProfileIdFollowedRouteImport } from './routes/_authenticated/profile/$id/followed'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -57,24 +60,47 @@ const AuthenticatedPostIdRoute = AuthenticatedPostIdRouteImport.update({
   path: '/post/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProfileIdIndexRoute =
+  AuthenticatedProfileIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfileIdRoute,
+  } as any)
+const AuthenticatedProfileIdFollowersRoute =
+  AuthenticatedProfileIdFollowersRouteImport.update({
+    id: '/followers',
+    path: '/followers',
+    getParentRoute: () => AuthenticatedProfileIdRoute,
+  } as any)
+const AuthenticatedProfileIdFollowedRoute =
+  AuthenticatedProfileIdFollowedRouteImport.update({
+    id: '/followed',
+    path: '/followed',
+    getParentRoute: () => AuthenticatedProfileIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/post/$id': typeof AuthenticatedPostIdRoute
-  '/profile/$id': typeof AuthenticatedProfileIdRoute
+  '/profile/$id': typeof AuthenticatedProfileIdRouteWithChildren
   '/auth/discord/callback': typeof AuthDiscordCallbackRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/profile/$id/followed': typeof AuthenticatedProfileIdFollowedRoute
+  '/profile/$id/followers': typeof AuthenticatedProfileIdFollowersRoute
+  '/profile/$id/': typeof AuthenticatedProfileIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/feed': typeof AuthenticatedFeedRoute
   '/post/$id': typeof AuthenticatedPostIdRoute
-  '/profile/$id': typeof AuthenticatedProfileIdRoute
   '/auth/discord/callback': typeof AuthDiscordCallbackRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/profile/$id/followed': typeof AuthenticatedProfileIdFollowedRoute
+  '/profile/$id/followers': typeof AuthenticatedProfileIdFollowersRoute
+  '/profile/$id': typeof AuthenticatedProfileIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,9 +109,12 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/feed': typeof AuthenticatedFeedRoute
   '/_authenticated/post/$id': typeof AuthenticatedPostIdRoute
-  '/_authenticated/profile/$id': typeof AuthenticatedProfileIdRoute
+  '/_authenticated/profile/$id': typeof AuthenticatedProfileIdRouteWithChildren
   '/auth/discord/callback': typeof AuthDiscordCallbackRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
+  '/_authenticated/profile/$id/followed': typeof AuthenticatedProfileIdFollowedRoute
+  '/_authenticated/profile/$id/followers': typeof AuthenticatedProfileIdFollowersRoute
+  '/_authenticated/profile/$id/': typeof AuthenticatedProfileIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,15 +126,20 @@ export interface FileRouteTypes {
     | '/profile/$id'
     | '/auth/discord/callback'
     | '/auth/google/callback'
+    | '/profile/$id/followed'
+    | '/profile/$id/followers'
+    | '/profile/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/feed'
     | '/post/$id'
-    | '/profile/$id'
     | '/auth/discord/callback'
     | '/auth/google/callback'
+    | '/profile/$id/followed'
+    | '/profile/$id/followers'
+    | '/profile/$id'
   id:
     | '__root__'
     | '/'
@@ -116,6 +150,9 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/$id'
     | '/auth/discord/callback'
     | '/auth/google/callback'
+    | '/_authenticated/profile/$id/followed'
+    | '/_authenticated/profile/$id/followers'
+    | '/_authenticated/profile/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,19 +221,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/profile/$id/': {
+      id: '/_authenticated/profile/$id/'
+      path: '/'
+      fullPath: '/profile/$id/'
+      preLoaderRoute: typeof AuthenticatedProfileIdIndexRouteImport
+      parentRoute: typeof AuthenticatedProfileIdRoute
+    }
+    '/_authenticated/profile/$id/followers': {
+      id: '/_authenticated/profile/$id/followers'
+      path: '/followers'
+      fullPath: '/profile/$id/followers'
+      preLoaderRoute: typeof AuthenticatedProfileIdFollowersRouteImport
+      parentRoute: typeof AuthenticatedProfileIdRoute
+    }
+    '/_authenticated/profile/$id/followed': {
+      id: '/_authenticated/profile/$id/followed'
+      path: '/followed'
+      fullPath: '/profile/$id/followed'
+      preLoaderRoute: typeof AuthenticatedProfileIdFollowedRouteImport
+      parentRoute: typeof AuthenticatedProfileIdRoute
+    }
   }
 }
+
+interface AuthenticatedProfileIdRouteChildren {
+  AuthenticatedProfileIdFollowedRoute: typeof AuthenticatedProfileIdFollowedRoute
+  AuthenticatedProfileIdFollowersRoute: typeof AuthenticatedProfileIdFollowersRoute
+  AuthenticatedProfileIdIndexRoute: typeof AuthenticatedProfileIdIndexRoute
+}
+
+const AuthenticatedProfileIdRouteChildren: AuthenticatedProfileIdRouteChildren =
+  {
+    AuthenticatedProfileIdFollowedRoute: AuthenticatedProfileIdFollowedRoute,
+    AuthenticatedProfileIdFollowersRoute: AuthenticatedProfileIdFollowersRoute,
+    AuthenticatedProfileIdIndexRoute: AuthenticatedProfileIdIndexRoute,
+  }
+
+const AuthenticatedProfileIdRouteWithChildren =
+  AuthenticatedProfileIdRoute._addFileChildren(
+    AuthenticatedProfileIdRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedFeedRoute: typeof AuthenticatedFeedRoute
   AuthenticatedPostIdRoute: typeof AuthenticatedPostIdRoute
-  AuthenticatedProfileIdRoute: typeof AuthenticatedProfileIdRoute
+  AuthenticatedProfileIdRoute: typeof AuthenticatedProfileIdRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFeedRoute: AuthenticatedFeedRoute,
   AuthenticatedPostIdRoute: AuthenticatedPostIdRoute,
-  AuthenticatedProfileIdRoute: AuthenticatedProfileIdRoute,
+  AuthenticatedProfileIdRoute: AuthenticatedProfileIdRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
