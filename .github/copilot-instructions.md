@@ -1,165 +1,219 @@
-# Fread - Copilot Instructions
+# Fread - AI Coding Agent Instructions
 
 ## Project Overview
 
-Fread is a social media platform (similar to Threads/Twitter) built with Next.js 16, React 19, and Prisma. Users can post content (text/images/videos), like, comment, follow others, and repost. Authentication planned via NextAuth.js V5.
+Fread is a social media platform (inspired by Threads) with a TypeScript-based API using Express.js + Prisma, and a React frontend using TanStack Router. The project runs in Docker with PostgreSQL.
 
-## Architecture & Key Patterns
+## Architecture
 
-## File & Directory Architecture
+### Backend (`api/`)
 
-Fread uses a layered, modular file structure to support clean architecture and maintainability:
+- **Framework**: Express.js with Bun runtime (development)
+- **ORM**: Prisma with PostgreSQL adapter
+- **Auth**: JWT tokens + OAuth (Discord/Google)
+- **Validation**: Zod schemas for request validation
+- **Testing**: Jest with ts-jest
 
-- **app/**: Next.js 16 App Router directory. Contains all route handlers, pages, layouts, and API endpoints. Subfolders:
-  - `api/`: Route handlers for API endpoints (REST/NextAuth).
-  - `generated/prisma/`: Prisma Client output (do not edit manually).
-  - `create-account/`, etc.: Feature-specific routes/pages.
-- **components/**: All React components, grouped by domain (e.g., `auth/`, `ui/`).
-- **lib/**: Shared utilities, Prisma singleton, helper functions. Subfolders for domain logic (e.g., `interfaces/`, `models/`, `queries/`, `services/`).
-- **prisma/**: Prisma schema and migrations. Source of truth for database models.
-- **public/**: Static assets (images, etc.).
-- **types/**: TypeScript type definitions for global/shared types.
-- **config files**: Project root contains config for Biome, Bun, Next.js, Docker, etc.
+#### Key Backend Patterns
 
-### Key Directory Conventions
+**Route Registration System**:
+Routes use a declarative pattern via `RouteDescriptor[]`:
 
-- **Path Aliases**: Use `@/*` for root imports (see `tsconfig.json`).
-- **Prisma Client**: Always import from `@/app/generated/prisma/client`.
-- **Singletons**: Use `lib/prisma.ts` for PrismaClient instance.
-- **Component Grouping**: Domain-based folders (e.g., `auth/`, `ui/`) for clarity and reusability.
-- **No Feature Markdown**: Do not create markdown files for features unless documenting architecture.
-
-### Example File Layout
-
-```
-app/
-	api/
-		account/route.ts
-		auth/[...nextauth]/route.ts
-	create-account/page.tsx
-	generated/prisma/client.ts
-components/
-	auth/CreateAccountForm.tsx
-	ui/button.tsx
-lib/
-	prisma.ts
-	queries/account.queries.ts
-prisma/
-	schema.prisma
-	migrations/
-types/
-	auth.d.ts
+```typescript
+// api/routes/account/account.route.ts
+{
+  method: "get",
+  path: `${prefix}/:id`,
+  middlewares: [validateParams(idParamSchema, "params")],
+  handler: asyncHandler(async (req, res) => {
+    const result = await controller.getProfile(req);
+    res.json(result);
+  })
+}
 ```
 
-Refer to this structure when adding new features, files, or refactoring code. Always keep domain logic, UI, and API routes separated for clarity and scalability.
+**Error Handling**:
 
-### Database Layer
+- All custom errors extend `AppError` (see `api/errors/`)
+- Use specific error classes: `BadRequestError`, `UnauthorizedError`, `NotFoundError`, `ForbiddenError`
+- Async handlers wrapped with `asyncHandler` utility to catch exceptions
+- Global error middleware converts `AppError` to JSON responses
 
-- **Custom Prisma Output**: Prisma Client generates to `app/generated/prisma/` (not default `node_modules`). Always import from `@/app/generated/prisma/client`.
-- **Singleton Pattern**: Use `@/lib/prisma.ts` for the PrismaClient instance (handles hot-reload in dev).
-- **Schema Design**: Posts use a self-referential Reply model for threading. Files are separate entities linked to posts/profiles.
+**Service Layer Pattern**:
 
-### Next.js Structure
+- Controllers (`api/controllers/`) handle HTTP concerns
+- Services (`api/services/`) contain database operations ending in `DB` suffix
+- Example: `createAccountDB()`, `getAccountByIdDB()`, `followAccountDB()`
 
-- **App Router**: Using Next.js 16 App Router (`app/` directory).
-- **React Compiler**: Enabled via `babel-plugin-react-compiler` in `next.config.ts`.
-- **Path Aliases**: `@/*` maps to project root (see `tsconfig.json`).
-- **UI Components**: shadcn/ui for component library (Tailwind CSS-based, customizable components).
+**Authentication**:
 
-### Tooling
+- `authMiddleware` for required auth (attaches `account` to request)
+- `optionalAuthMiddleware` for optional auth (used for viewing public/private posts)
+- JWT tokens validated via `verifyJWT()` utility
 
-- **Linter/Formatter**: Biome (not ESLint/Prettier). Run `bun lint` to check, `bun format` to fix.
-- **Package Manager**: Bun (inferred from scripts usage context).
-- **Database**: PostgreSQL via Docker Compose on port 5432 (credentials in `docker-compose.yml`).
+**Prisma Schema Location**:
 
-## Critical Workflows
+- Schema: `api/prisma/schema.prisma`
+- Generated client: `api/generated/prisma/` (custom output path)
+- Import via `api/prisma.ts` which exports configured `prisma` instance
 
-### Database Migrations
+### Frontend (`front/`)
+
+- **Framework**: React 19 with TanStack Router (file-based routing)
+- **State Management**: TanStack Query for server state
+- **Styling**: Tailwind CSS 4 with shadcn/ui components
+- **Forms**: TanStack Form
+- **Code Quality**: Biome for linting/formatting
+
+#### Key Frontend Patterns
+
+**File-Based Routing**:
+
+- Routes in `front/src/routes/` map to URLs
+- `_authenticated.tsx` layout protects nested routes
+- Dynamic params: `$id.tsx` for `/profile/:id`
+- Export pattern: `export const Route = createFileRoute("/path")({ component })`
+
+**Data Fetching**:
+
+- Custom hooks in `front/src/hooks/queries/` wrap TanStack Query
+- Mutations in `front/src/hooks/mutations/`
+- API integration via axios in `front/src/integrations/`
+
+**Auth Context**:
+
+- JWT stored in localStorage
+- `useAuth()` hook provides user context
+- Protected routes redirect via TanStack Router's `beforeLoad`
+
+## Development Workflow
+
+### Running Locally
+
+**Docker (Recommended)**:
 
 ```bash
-bun db:migrate      # Run after schema changes (creates migration + generates client)
-bun db:generate     # Regenerate Prisma Client only (no schema changes)
+docker compose up -d  # Starts postgres + api + front
+docker compose down
 ```
 
-Always run `db:migrate` after modifying `prisma/schema.prisma`. Client code regenerates to `app/generated/prisma/`.
+**Local Development**:
 
-### Development Setup
+```bash
+# API (uses Bun)
+cd api
+bun install
+bun run db:generate  # Generate Prisma client
+bun run db:migrate   # Run migrations
+bun run index.ts
 
-1. Start PostgreSQL: `docker compose up -d`
-2. Run migrations: `bun db:migrate`
-3. Start dev server: `bun dev`
+# Frontend
+cd front
+bun install
+bun run dev  # Runs on port 3000
+```
 
-### Code Quality
+### Environment Variables
 
-- Run `bun lint` before committing (Biome checks Next.js and React domains).
-- Auto-fix imports: Biome organizes imports on save.
+**API** (`.env` or docker-compose):
 
-## Project-Specific Conventions
+- `DATABASE_URL`: PostgreSQL connection (Docker: `postgresql://root:RootPassword@postgres:5432/fread_db`)
+- `JWT_SECRET`: Min 32 chars (validated via Zod in `api/env.ts`)
+- OAuth: `AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET`, `DISCORD_REDIRECT_URI`
+- OAuth: `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `GOOGLE_REDIRECT_URI`
 
-### Database Models
+**Frontend** (`.env.local`):
 
-- **IDs**: All models use `@default(cuid())` for unique, sortable IDs.
-- **Privacy**: Account and Post models have `private` boolean fields.
-- **OAuth**: Account supports multiple auth providers (appleId, googleId, discordId).
-- **Timestamps**: Use `createdAt` (not `created_at`) for consistency.
+- API base URL for axios integration
 
-### File Relationships
+### Testing
 
-- Profile pictures use a separate one-to-one `File` relation (`profilePictureId`).
-- Post attachments use many-to-many `File[]` relation.
-- Files always belong to an Account (creator).
+**API**:
 
-### Reply/Threading
+```bash
+cd api
+bun test              # Run all tests
+bun test:watch        # Watch mode
+bun test:coverage     # Coverage report
+```
 
-- Replies are separate `Reply` join table with `basePostId` (parent) and `replyPostId` (child).
-- Each reply creates a new Post and links it via Reply model.
+- Tests use Jest mocks for Prisma client
+- Pattern: Mock `prisma` object from `api/prisma` module
+- See `api/tests/services/follow.service.spec.ts` for example
 
-### Authentication (Planned)
+**Frontend**:
 
-- NextAuth.js V5 will handle authentication.
-- Account model already has OAuth provider fields (appleId, googleId, discordId).
+```bash
+cd front
+bun test              # Run Vitest tests
+bun test:watch        # Watch mode
+bun test:ui           # Vitest UI
+bun test:coverage     # Coverage
+```
 
-## Important Files
+### Database Operations
 
-- `prisma/schema.prisma`: Database schema (source of truth).
-- `lib/prisma.ts`: Prisma Client singleton (import from here).
-- `app/generated/prisma/`: Generated Prisma Client (don't edit manually).
-- `biome.json`: Linter/formatter config (Next.js and React domains enabled).
-- `docker-compose.yml`: PostgreSQL setup (DB name: fread_db, user: root).
+```bash
+cd api
+bun run db:generate   # Regenerate Prisma client after schema changes
+bun run db:migrate    # Create and apply migration
+```
 
-## Code Quality Standards
+## Project Conventions
 
-### Clean Code Principles
+### Code Style
 
-- **No `any` types**: Always use proper TypeScript types. Use `unknown` if the type is truly unknown, then narrow it.
-- **No code duplication**: Extract shared logic into reusable functions/components. Follow DRY (Don't Repeat Yourself).
-- **Single Responsibility**: Each function/component should do one thing well.
-- **Meaningful names**: Use descriptive variable/function names that explain intent.
-- **No comments in code**: Code should be self-explanatory through clear naming and structure. Refactor complex logic into well-named functions instead of adding comments.
-- **No markdown files for features**: When implementing features, write only the necessary code files. Don't create summary markdown documents unless explicitly requested.
+- **API**: No explicit formatter/linter configured (follow TypeScript conventions)
+- **Frontend**: Use Biome - `bun run check:fix` to auto-fix
+- Prefer explicit types over `any`
+- Use Zod schemas for runtime validation
 
-### Pre-Completion Checklist
+### File Organization
 
-Before marking any task as complete, ALWAYS:
+- **API Routes**: Group by feature in `api/routes/{feature}/`
+- **API Services**: Named `{feature}.service.ts` with `{action}DB` function exports
+- **Frontend Components**: Shared UI in `components/`, page-specific inline
+- **Schemas**: Centralized in `api/schemas/` and reused across routes
 
-1. Run `bun lint` - Fix all linting errors.
-2. Run `bun format` - Ensure consistent formatting.
-3. Verify TypeScript types compile without errors.
-4. Test the feature manually if applicable.
+### Naming
 
-### Documentation Updates
+- Database functions: `verbNounDB()` (e.g., `createAccountDB`, `getPostByIdDB`)
+- Middleware: `{purpose}Middleware` (e.g., `authMiddleware`, `errorMiddleware`)
+- Routes: Export `createAccountRoutes()` function returning `RouteDescriptor[]`
+- Frontend routes: Use component name matching the page (e.g., `ProfilePage`)
 
-When making architectural changes, new patterns, or workflow modifications, update `.github/copilot-instructions.md` to reflect:
+### Database Schema Notes
 
-- New conventions or patterns introduced.
-- Changes to project structure or tooling.
-- Additional workflows or commands.
-- Important lessons learned or pitfalls discovered.
+- All IDs use `cuid()` (Prisma default)
+- Cascade deletes configured for user content (see `onDelete: Cascade` in schema)
+- Unique constraints on follow/like to prevent duplicates
+- `profileCompleted` flag tracks OAuth signup completion
 
-## Common Pitfalls
+## Integration Points
 
-- Don't import from `@prisma/client` - use `@/app/generated/prisma/client` instead.
-- Don't run `prisma generate` directly - use `bun db:generate` (respects custom output path).
-- Don't use ESLint/Prettier commands - this project uses Biome exclusively.
-- Remember to handle both authenticated and public access paths (see README requirements).
-- Never use `any` type - it defeats TypeScript's type safety.
+- **OAuth Flow**: `api/services/oauth.service.ts` handles Discord/Google callbacks
+- **File Uploads**: `api/services/file.service.ts` for profile pictures and post attachments
+- **Cross-Origin**: CORS enabled globally in `api/index.ts`
+- **Frontend API**: Axios client configured in `front/src/integrations/`
+
+## Common Tasks
+
+**Add New Route**:
+
+1. Create route file in `api/routes/{feature}/`
+2. Define `RouteDescriptor[]` with path, method, middlewares, handler
+3. Create controller in `api/controllers/` and service in `api/services/`
+4. Register in `api/index.ts` via `app.use()`
+
+**Add Database Model**:
+
+1. Update `api/prisma/schema.prisma`
+2. Run `bun run db:migrate` (creates migration + regenerates client)
+3. Use new model via `prisma.{model}.{operation}()` in services
+
+**Add Frontend Page**:
+
+1. Create route file in `front/src/routes/`
+2. Export `Route = createFileRoute("/path")({ component })`
+3. Use TanStack Query hooks for data fetching
+4. Protect with `_authenticated` layout if needed
