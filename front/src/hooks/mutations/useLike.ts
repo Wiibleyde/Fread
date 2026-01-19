@@ -29,7 +29,7 @@ export const useLike = () => {
 
 			return { previousPost };
 		},
-		onError: (error, postId, context) => {
+		onError: (_error, postId, context) => {
 			if (context?.previousPost) {
 				queryClient.setQueryData(
 					queryKeys.posts.detail(postId),
@@ -38,7 +38,7 @@ export const useLike = () => {
 			}
 			toast.error("Failed to like post");
 		},
-		onSettled: (data, error, postId) => {
+		onSettled: (_data, _error, postId) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.posts.detail(postId),
 			});
@@ -72,7 +72,7 @@ export const useUnlike = () => {
 
 			return { previousPost };
 		},
-		onError: (error, postId, context) => {
+		onError: (_error, postId, context) => {
 			if (context?.previousPost) {
 				queryClient.setQueryData(
 					queryKeys.posts.detail(postId),
@@ -81,7 +81,7 @@ export const useUnlike = () => {
 			}
 			toast.error("Failed to unlike post");
 		},
-		onSettled: (data, error, postId) => {
+		onSettled: (_data, _error, postId) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.posts.detail(postId),
 			});

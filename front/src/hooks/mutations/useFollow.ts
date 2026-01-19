@@ -32,7 +32,7 @@ export const useFollow = () => {
 
 			return { previousAccount };
 		},
-		onError: (error, accountId, context) => {
+		onError: (_error, accountId, context) => {
 			if (context?.previousAccount) {
 				queryClient.setQueryData(
 					queryKeys.account.profile(accountId),
@@ -44,7 +44,7 @@ export const useFollow = () => {
 		onSuccess: () => {
 			toast.success("Successfully followed user");
 		},
-		onSettled: (data, error, accountId) => {
+		onSettled: (_data, _error, accountId) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.account.profile(accountId),
 			});
@@ -84,7 +84,7 @@ export const useUnfollow = () => {
 
 			return { previousAccount };
 		},
-		onError: (error, accountId, context) => {
+		onError: (_error, accountId, context) => {
 			if (context?.previousAccount) {
 				queryClient.setQueryData(
 					queryKeys.account.profile(accountId),
@@ -96,7 +96,7 @@ export const useUnfollow = () => {
 		onSuccess: () => {
 			toast.success("Successfully unfollowed user");
 		},
-		onSettled: (data, error, accountId) => {
+		onSettled: (_data, _error, accountId) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.account.profile(accountId),
 			});

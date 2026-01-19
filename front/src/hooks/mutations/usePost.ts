@@ -39,7 +39,7 @@ export const useEditPost = () => {
 		}) => {
 			return postApi.editPost(postId, { content });
 		},
-		onSuccess: (data, variables) => {
+		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.posts.detail(variables.postId),
 			});
@@ -82,7 +82,7 @@ export const useCreateReply = () => {
 		}) => {
 			return postApi.createReply(postId, { content });
 		},
-		onSuccess: (data, variables) => {
+		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: queryKeys.posts.replies(variables.postId),
 			});

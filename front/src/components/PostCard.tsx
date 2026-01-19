@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, Lock } from "lucide-react";
-import { LikeButton } from "./LikeButton";
-import type { Post } from "@/lib/api-types";
+import { Lock, MessageCircle } from "lucide-react";
 import { useAccount } from "@/hooks/queries/useAccount";
+import type { Post } from "@/lib/api-types";
+import { LikeButton } from "./LikeButton";
 
 interface PostCardProps {
 	post: Post;
@@ -42,9 +42,7 @@ export function PostCard({ post, showReplies = true }: PostCardProps) {
 						@{account?.username || "..."}
 					</Link>
 				</div>
-				{post.private && (
-					<Lock className="h-4 w-4 text-gray-600" title="Private post" />
-				)}
+				{post.private && <Lock className="h-4 w-4 text-gray-600" />}
 			</div>
 
 			<Link to="/post/$id" params={{ id: post.id }} className="block">
