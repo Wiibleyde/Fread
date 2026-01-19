@@ -1,106 +1,119 @@
-import { Link } from '@tanstack/react-router'
-
-import { useState } from 'react'
-import { ClipboardType, Home, Menu, Network, X } from 'lucide-react'
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Home, Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+	const [isOpen, setIsOpen] = useState(false);
+	const { isAuthenticated, username, userId, logout } = useAuth();
 
-  return (
-    <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">
-            <img
-              src="/tanstack-word-logo-white.svg"
-              alt="TanStack Logo"
-              className="h-10"
-            />
-          </Link>
-        </h1>
-      </header>
+	const handleLogout = () => {
+		logout();
+		setIsOpen(false);
+		window.location.href = "/login";
+	};
 
-      <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Navigation</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-            aria-label="Close menu"
-          >
-            <X size={24} />
-          </button>
-        </div>
+	return (
+		<>
+			<header className="p-4 flex items-center justify-between bg-white text-black shadow-md border-b border-black">
+				<div className="flex items-center">
+					<button
+						onClick={() => setIsOpen(true)}
+						className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+						aria-label="Open menu"
+					>
+						<Menu size={24} />
+					</button>
+					<h1 className="ml-4 text-2xl font-bold">
+						<Link to="/">Fread</Link>
+					</h1>
+				</div>
+				{isAuthenticated && username && (
+					<div className="text-sm text-gray-600">@{username}</div>
+				)}
+			</header>
 
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <Link
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Home size={20} />
-            <span className="font-medium">Home</span>
-          </Link>
+			<aside
+				className={`fixed top-0 left-0 h-full w-80 bg-white text-black shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-r border-black ${
+					isOpen ? "translate-x-0" : "-translate-x-full"
+				}`}
+			>
+				<div className="flex items-center justify-between p-4 border-b border-black">
+					<h2 className="text-xl font-bold">Menu</h2>
+					<button
+						onClick={() => setIsOpen(false)}
+						className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+						aria-label="Close menu"
+					>
+						<X size={24} />
+					</button>
+				</div>
 
-          {/* Demo Links Start */}
+				<nav className="flex-1 p-4 overflow-y-auto">
+					{isAuthenticated ? (
+						<>
+							<Link
+								to="/"
+								onClick={() => setIsOpen(false)}
+								className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+								activeProps={{
+									className:
+										"flex items-center gap-3 p-3 rounded-lg bg-black text-white transition-colors mb-2",
+								}}
+							>
+								<Home size={20} />
+								<span className="font-medium">Home</span>
+							</Link>
 
-          <Link
-            to="/demo/form/simple"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <ClipboardType size={20} />
-            <span className="font-medium">Simple Form</span>
-          </Link>
+							<Link
+								to="/feed"
+								onClick={() => setIsOpen(false)}
+								className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+								activeProps={{
+									className:
+										"flex items-center gap-3 p-3 rounded-lg bg-black text-white transition-colors mb-2",
+								}}
+							>
+								<Home size={20} />
+								<span className="font-medium">Feed</span>
+							</Link>
 
-          <Link
-            to="/demo/form/address"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <ClipboardType size={20} />
-            <span className="font-medium">Address Form</span>
-          </Link>
+							{userId && (
+								<Link
+									to="/profile/$id"
+									params={{ id: userId }}
+									onClick={() => setIsOpen(false)}
+									className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+									activeProps={{
+										className:
+											"flex items-center gap-3 p-3 rounded-lg bg-black text-white transition-colors mb-2",
+									}}
+								>
+									<User size={20} />
+									<span className="font-medium">Profile</span>
+								</Link>
+							)}
 
-          <Link
-            to="/demo/tanstack-query"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Network size={20} />
-            <span className="font-medium">TanStack Query</span>
-          </Link>
-
-          {/* Demo Links End */}
-        </nav>
-      </aside>
-    </>
-  )
+							<button
+								onClick={handleLogout}
+								className="flex w-full items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mt-4"
+							>
+								<LogOut size={20} />
+								<span className="font-medium">Logout</span>
+							</button>
+						</>
+					) : (
+						<Link
+							to="/login"
+							onClick={() => setIsOpen(false)}
+							className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+						>
+							<User size={20} />
+							<span className="font-medium">Login</span>
+						</Link>
+					)}
+				</nav>
+			</aside>
+		</>
+	);
 }
