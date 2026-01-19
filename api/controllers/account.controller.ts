@@ -1,3 +1,4 @@
+import type { Request } from "express";
 import ForbiddenError from "../errors/forbidden.error";
 import InternalError from "../errors/internal.error";
 import type { AuthenticatedRequest } from "../models/auth.model";
