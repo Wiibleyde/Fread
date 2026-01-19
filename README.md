@@ -10,6 +10,29 @@
 - [Structure du projet](#structure-du-projet)
 - [Manuel utilisateur](#manuel-utilisateur)
 - [Manuel technique pour les développeurs](#manuel-technique-pour-les-developpeurs)
+- [Architecture du dépôt](#architecture-du-dépôt)
+- [Dossiers principaux de l'API (api/)](#dossiers-principaux-de-lapi-api)
+- [Fichier d'entrée de l'API : api/index.ts](#fichier-dentrée-de-lapi--apiindexts)
+- [Flux typique d'une requête](#flux-typique-dune-requête)
+- [Rôle des middlewares](#rôle-des-middlewares)
+- [Commandes de base (API)](#commandes-de-base-api)
+- [Gestion de la base de données et de Prisma](#gestion-de-la-base-de-données-et-de-prisma)
+- [Tests](#tests)
+- [Architecture Frontend (front/)](#architecture-frontend-front)
+- [Dossiers principaux du Frontend (front/src/)](#dossiers-principaux-du-frontend-frontsrc)
+- [Fichier d'entrée du Frontend : front/src/main.tsx](#fichier-dentrée-du-frontend--frontsrcmaintsx)
+- [Flux typique d'une page](#flux-typique-dune-page)
+- [Routage basé sur fichiers (File-Based Routing)](#routage-basé-sur-fichiers-file-based-routing)
+- [Authentification Frontend](#authentification-frontend)
+- [Gestion des données avec TanStack Query](#gestion-des-données-avec-tanstack-query)
+- [Composants UI avec shadcn/ui](#composants-ui-avec-shadcnui)
+- [Commandes de base (Frontend)](#commandes-de-base-frontend)
+- [Tests Frontend](#tests-frontend)
+- [Qualité de code](#qualité-de-code)
+- [Configuration de l'environnement (Frontend)](#configuration-de-lenvironnement-frontend)
+- [Déploiement avec Docker](#déploiement-avec-docker)
+- [Conventions de développement Frontend](#conventions-de-développement-frontend)
+- [Intégration API-Frontend](#intégration-api-frontend)
 
 ## Description du projet
 
@@ -18,6 +41,7 @@ Fread est une application de réseau social qui permet aux utilisateurs de parta
 Cette application est basée sur la stack technique Express.js pour le backend et Next.js pour le frontend, avec une base de données PostgreSQL gérée via l'ORM Prisma. L'authentification des utilisateurs est gérée par l'utilisation de JWT (JSON Web Tokens) pour assurer la sécurité et la confidentialité des données utilisateur.
 
 Notre projet permet aux utilisateurs de:
+
 - Publier des postes (texte)
 - Liker et commenter les postes
 - S'abonner à d'autres utilisateurs
@@ -54,40 +78,41 @@ Le projet peut être lancé entièrement via Docker (API + base PostgreSQL) grâ
 
 1. **Configurer les variables d'environnement dans `docker-compose.yml` (service `api`)** :
 
-  - `DATABASE_URL` : URL de connexion à PostgreSQL (par défaut `postgresql://root:RootPassword@postgres:5432/fread_db`, ne pas la modifier tant que vous utilisez la base fournie par le service `postgres`).
-  - `PORT` : port exposé par l'API (par défaut `3001`, mappé sur `localhost:3001`).
-  - `JWT_SECRET` : chaîne secrète utilisée pour signer les JWT (**à changer impérativement** en production, au moins 32 caractères).
-  - `AUTH_DISCORD_ID` / `AUTH_DISCORD_SECRET` / `DISCORD_REDIRECT_URI` : identifiants OAuth Discord et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Discord, `http://localhost:{PORT_FRONT}/auth/discord/callback`.
-  - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` / `GOOGLE_REDIRECT_URI` : identifiants OAuth Google et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Google , `http://localhost:{PORT_FRONT}/auth/google/callback`.
+- `DATABASE_URL` : URL de connexion à PostgreSQL (par défaut `postgresql://root:RootPassword@postgres:5432/fread_db`, ne pas la modifier tant que vous utilisez la base fournie par le service `postgres`).
+- `PORT` : port exposé par l'API (par défaut `3001`, mappé sur `localhost:3001`).
+- `JWT_SECRET` : chaîne secrète utilisée pour signer les JWT (**à changer impérativement** en production, au moins 32 caractères).
+- `AUTH_DISCORD_ID` / `AUTH_DISCORD_SECRET` / `DISCORD_REDIRECT_URI` : identifiants OAuth Discord et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Discord, `http://localhost:{PORT_FRONT}/auth/discord/callback`.
+- `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` / `GOOGLE_REDIRECT_URI` : identifiants OAuth Google et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Google , `http://localhost:{PORT_FRONT}/auth/google/callback`.
 
 2. **Construire les images et démarrer les conteneurs** (depuis la racine du projet) :
 
-  ```bash
-  docker compose build
-  docker compose up -d
-  ```
+```bash
+docker compose build
+docker compose up -d
+```
 
-  Cela démarre :
-  - un conteneur `postgres` avec la base `fread_db` ;
-  - un conteneur `api` qui génère le client Prisma, applique les migrations puis lance l'API Express.
+Cela démarre :
+
+- un conteneur `postgres` avec la base `fread_db` ;
+- un conteneur `api` qui génère le client Prisma, applique les migrations puis lance l'API Express.
 
 3. **Vérifier que l'API est en ligne** :
 
-  ```bash
-  curl http://localhost:3001/status
-  ```
+```bash
+curl http://localhost:3001/status
+```
 
-  Vous devez obtenir une réponse JSON du type :
+Vous devez obtenir une réponse JSON du type :
 
-  ```json
-  { "status": "ok", "timestamp": "2023-10-11T00:00:00.000Z" }
-  ```
+```json
+{ "status": "ok", "timestamp": "2023-10-11T00:00:00.000Z" }
+```
 
 4. **Arrêter les conteneurs** :
 
-  ```bash
-  docker compose down
-  ```
+```bash
+docker compose down
+```
 
 ## Utilisation
 
@@ -116,10 +141,12 @@ Notre projet devra :
 - Permettre la recherche de postes par mots-clés ou hashtags
 
 L'utilisateur devra être connnecté pour:
+
 - Publier, liker, commenter, répondre, s'abonner
 - Voir son fil d'actualité personnalisé
 
 L'utilisateur non connecté pourra:
+
 - Voir les postes/commentaires publics
 - Consulter les profils publics
 
@@ -143,9 +170,9 @@ La collection Postman définit une variable `jwt` qui peut être utilisée pour 
 
 #### Authentification (Auth)
 
-- `GET /auth/discord`  
+- `GET /auth/discord`
   - Authentification : non requise (démarre le flux OAuth Discord).
-- `GET /auth/google`  
+- `GET /auth/google`
   - Authentification : non requise (démarre le flux OAuth Google).
 
 Ces routes lancent le flux d'authentification via un fournisseur externe (à utiliser depuis un navigateur ou via Postman pour tester la redirection).
@@ -221,7 +248,7 @@ Ces routes lancent le flux d'authentification via un fournisseur externe (à uti
 
 - `GET /post/:id` — Obtenir un post
   - Authentification : optionnelle.
-  - Sans en-tête `Authorization` : accès invité aux contenus publics.  
+  - Sans en-tête `Authorization` : accès invité aux contenus publics.
   - Avec en-tête `Authorization` :
 
     ```text
@@ -272,8 +299,8 @@ Ces routes lancent le flux d'authentification via un fournisseur externe (à uti
     ```
 
 - `GET /post/:id/replies` — Récupérer les réponses à un post
-  - Authentification : optionnelle.  
-  - Sans en-tête `Authorization` : accès invité aux réponses publiques.  
+  - Authentification : optionnelle.
+  - Sans en-tête `Authorization` : accès invité aux réponses publiques.
   - Avec en-tête `Authorization` :
 
     ```text
@@ -413,3 +440,342 @@ bun run test:watch    # tests en mode watch
 bun run test:coverage # rapport de couverture
 ```
 
+---
+
+## Architecture Frontend (front/)
+
+Le frontend de Fread est une application React moderne utilisant TanStack Router pour la navigation, TanStack Query pour la gestion de l'état serveur, et Tailwind CSS pour le style. L'application est construite avec Vite et utilise TypeScript pour la sûreté de type.
+
+### Technologies utilisées
+
+- **Framework UI** : React 19 avec hooks et StrictMode
+- **Routeur** : TanStack Router avec routage basé sur les fichiers (file-based routing)
+- **Gestion d'état serveur** : TanStack Query (React Query) pour le cache et la synchronisation des données
+- **Gestion de formulaires** : TanStack Form avec validation
+- **Styling** : Tailwind CSS 4 avec composants shadcn/ui
+- **HTTP Client** : Axios pour les requêtes vers l'API
+- **Tests** : Vitest avec Testing Library
+- **Qualité de code** : Biome (linting et formatting)
+- **Build tool** : Vite
+
+### Dossiers principaux du Frontend (front/src/)
+
+- `routes/` : définit la structure de navigation de l'application avec le routage basé sur fichiers
+  - `__root.tsx` : layout racine de l'application
+  - `_authenticated.tsx` : layout pour les routes protégées nécessitant une authentification
+  - `index.tsx`, `login.tsx` : pages publiques
+  - `_authenticated/` : pages nécessitant une authentification (feed, profil, posts)
+- `components/` : composants React réutilisables
+  - `ui/` : composants UI de base (button, input, etc.) basés sur shadcn/ui
+  - Composants métier : `PostCard`, `ProfileCard`, `FollowButton`, `LikeButton`, `CreatePostForm`
+- `contexts/` : contextes React pour partager l'état global
+  - `AuthContext.tsx` : gère l'état d'authentification et les informations utilisateur
+- `hooks/` : hooks React personnalisés
+  - `queries/` : hooks TanStack Query pour récupérer les données (GET)
+  - `mutations/` : hooks TanStack Query pour modifier les données (POST, PATCH, DELETE)
+  - `useAuth.ts` : hook pour accéder au contexte d'authentification
+- `integrations/` : intégrations avec des bibliothèques tierces
+  - `tanstack-query/` : configuration de TanStack Query (Provider, Devtools)
+- `lib/` : utilitaires et configuration
+  - `api-client.ts` : client Axios configuré pour l'API
+  - `api-types.ts` : types TypeScript pour les réponses de l'API
+  - `query-keys.ts` : clés de cache TanStack Query centralisées
+  - `storage.ts` : utilitaires pour le localStorage (JWT)
+  - `utils.ts` : fonctions utilitaires diverses
+- `test/` : configuration des tests
+
+### Fichier d'entrée du Frontend : `front/src/main.tsx`
+
+Le fichier `main.tsx` est le point d'entrée de l'application React. Il :
+
+- crée le routeur TanStack avec l'arbre de routes généré automatiquement (`routeTree.gen.ts`) ;
+- configure le contexte TanStack Query pour la gestion des données serveur ;
+- initialise les options du routeur (preload, scroll restoration, etc.) ;
+- enveloppe l'application dans les Providers nécessaires (Query, Router) ;
+- rend l'application dans le DOM via `ReactDOM.createRoot`.
+
+### Flux typique d'une page
+
+Exemple : affichage du profil d'un utilisateur.
+
+1. **Navigation** : l'utilisateur clique sur un lien vers `/profile/:id` ou tape l'URL directement.
+
+2. **Route** : TanStack Router charge le composant défini dans `routes/_authenticated/profile/$id/index.tsx`.
+
+3. **Protection** : la route hérite du layout `_authenticated.tsx` qui vérifie l'authentification via `beforeLoad` :
+   - Si non connecté, redirection vers `/login`
+   - Si connecté, la route se charge normalement
+
+4. **Chargement des données** : le composant utilise un hook de query personnalisé (ex. `useAccount(id)`) pour récupérer les données du profil depuis l'API :
+   - Le hook encapsule `useQuery` de TanStack Query
+   - Une requête HTTP GET est envoyée via le client Axios configuré dans `lib/api-client.ts`
+   - Le token JWT est automatiquement ajouté aux en-têtes si l'utilisateur est authentifié
+
+5. **Gestion du cache** : TanStack Query gère automatiquement :
+   - Le cache des données
+   - Le refetch en arrière-plan
+   - Les états de chargement et d'erreur
+
+6. **Rendu** : le composant affiche les données récupérées via des composants UI réutilisables (`ProfileCard`, etc.).
+
+7. **Interactions** : les actions utilisateur (follow, like, create post) utilisent des hooks de mutation :
+   - Les mutations appellent l'API via Axios
+   - En cas de succès, le cache TanStack Query est invalidé pour refetch les données
+   - Des toasts sont affichés pour informer l'utilisateur
+
+### Routage basé sur fichiers (File-Based Routing)
+
+TanStack Router génère automatiquement l'arbre de routes à partir de la structure des fichiers dans `src/routes/` :
+
+- `index.tsx` → route `/`
+- `login.tsx` → route `/login`
+- `profile/$id.tsx` → route `/profile/:id` (paramètre dynamique)
+- `_authenticated/feed.tsx` → route `/feed` (protégée par le layout `_authenticated`)
+- `_authenticated/profile/$id/followers.tsx` → route `/profile/:id/followers` (imbriquée)
+
+**Conventions de nommage** :
+
+- `$id.tsx` : paramètre dynamique dans l'URL
+- `_authenticated.tsx` : layout (préfixe `_`) qui enveloppe les routes enfants
+- `index.tsx` : route par défaut du dossier parent
+
+**Export pattern** :
+Chaque fichier de route exporte une constante `Route` créée avec `createFileRoute()` :
+
+```tsx
+export const Route = createFileRoute("/profile/$id")({
+  component: ProfilePage,
+  // options: beforeLoad, loader, etc.
+});
+```
+
+### Authentification Frontend
+
+L'authentification est gérée via un système de contexte React et JWT :
+
+1. **AuthContext** (`contexts/AuthContext.tsx`) :
+   - Stocke l'état d'authentification (utilisateur connecté ou non)
+   - Fournit des méthodes : `login()`, `logout()`, `updateUser()`
+   - Lit le JWT depuis le localStorage au chargement de l'application
+   - Décode le JWT pour extraire les informations utilisateur
+
+2. **Hook useAuth** :
+   - Permet d'accéder au contexte d'authentification depuis n'importe quel composant
+   - Exemple : `const { user, isAuthenticated, logout } = useAuth();`
+
+3. **Client API** (`lib/api-client.ts`) :
+   - Instance Axios configurée avec un intercepteur de requêtes
+   - Ajoute automatiquement l'en-tête `Authorization: Bearer <token>` si un JWT est présent
+   - Gère les erreurs 401 (Unauthorized) pour rediriger vers la page de connexion
+
+4. **Routes protégées** :
+   - Le layout `_authenticated.tsx` utilise `beforeLoad` pour vérifier l'authentification
+   - Redirige vers `/login` si l'utilisateur n'est pas connecté
+
+5. **Callbacks OAuth** :
+   - Routes dédiées pour les redirections OAuth : `/auth/discord/callback`, `/auth/google/callback`
+   - Extraient le JWT de l'URL, le stockent dans le localStorage et redirigent vers le feed
+
+### Gestion des données avec TanStack Query
+
+TanStack Query (React Query) gère l'état serveur de manière déclarative :
+
+**Queries (lecture)** :
+
+- Hooks personnalisés dans `hooks/queries/` encapsulent `useQuery`
+- Exemple : `useAccount(id)` récupère un profil utilisateur
+- Clés de cache définies dans `lib/query-keys.ts` pour une gestion centralisée
+- Configuration globale dans `integrations/tanstack-query/root-provider.tsx`
+
+**Mutations (écriture)** :
+
+- Hooks personnalisés dans `hooks/mutations/` encapsulent `useMutation`
+- Exemple : `useCreatePost()` crée un nouveau post
+- Après succès, invalidation automatique du cache pour refetch les données
+- Gestion des états de chargement, succès, erreur
+
+**Avantages** :
+
+- Cache automatique avec stale-while-revalidate
+- Refetch en arrière-plan pour garder les données fraîches
+- États de chargement et d'erreur gérés automatiquement
+- Optimistic updates possibles
+- Dédoublonnage des requêtes
+
+### Composants UI avec shadcn/ui
+
+Le projet utilise shadcn/ui, une collection de composants React réutilisables basés sur Radix UI et Tailwind CSS :
+
+- Composants de base dans `components/ui/` : `Button`, `Input`, `Label`, `Select`, `Slider`, `Switch`, `Textarea`
+- Personnalisables via Tailwind et variants (class-variance-authority)
+- Accessibles par défaut (Radix UI)
+- Copiés directement dans le projet (pas de dépendance npm à shadcn)
+
+**Ajout de nouveaux composants** :
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+### Commandes de base (Frontend)
+
+Toutes les commandes ci-dessous se lancent depuis le dossier `front/`.
+
+#### Installation des dépendances
+
+```bash
+cd front
+bun install
+```
+
+#### Lancer le serveur de développement
+
+```bash
+cd front
+bun run dev  # Démarre sur http://localhost:3000
+```
+
+Le serveur Vite démarre avec Hot Module Replacement (HMR) pour un rechargement instantané lors des modifications de code.
+
+#### Build de production
+
+```bash
+cd front
+bun run build  # Compile l'app optimisée dans dist/
+```
+
+Le build génère des fichiers statiques optimisés (minification, tree-shaking, code splitting) dans le dossier `dist/`.
+
+#### Prévisualiser le build de production
+
+```bash
+cd front
+bun run preview  # Sert le dossier dist/ localement
+```
+
+### Tests Frontend
+
+Le frontend utilise Vitest (compatible Vite) avec Testing Library pour les tests unitaires et d'intégration.
+
+Depuis `front/` :
+
+```bash
+bun run test          # Lance tous les tests
+bun run test:watch    # Tests en mode watch (relance automatique)
+bun run test:ui       # Interface UI pour les tests (navigateur)
+bun run test:coverage # Génère un rapport de couverture
+```
+
+**Organisation des tests** :
+
+- Tests unitaires à côté des fichiers : `Component.test.tsx`
+- Utilitaires de test dans `src/test/`
+- Configuration Vitest dans `vite.config.ts`
+
+**Exemples de tests** :
+
+- `FollowButton.test.tsx` : teste le comportement du bouton de suivi
+- `LikeButton.test.tsx` : teste le bouton de like
+- `AuthContext.test.tsx` : teste le contexte d'authentification
+
+### Qualité de code
+
+Le projet utilise Biome pour le linting et le formatting (alternative à ESLint + Prettier).
+
+Depuis `front/` :
+
+```bash
+bun run lint          # Vérifie les erreurs de linting
+bun run lint:fix      # Corrige automatiquement les erreurs
+bun run format        # Affiche les erreurs de formatage
+bun run check         # Lint + format (vérification complète)
+bun run check:fix     # Corrige lint + format automatiquement
+```
+
+Configuration dans `biome.json`.
+
+### Configuration de l'environnement (Frontend)
+
+Le frontend utilise un fichier `.env.local` pour les variables d'environnement :
+
+```bash
+# URL de l'API backend
+VITE_API_URL=http://localhost:3001
+```
+
+Les variables doivent être préfixées par `VITE_` pour être accessibles dans le code via `import.meta.env.VITE_API_URL`.
+
+### Déploiement avec Docker
+
+Le frontend peut être déployé en production via Docker (voir `front/Dockerfile`) :
+
+1. Build multi-stage avec Bun pour construire l'app
+2. Serveur Nginx pour servir les fichiers statiques
+3. Configuration Nginx dans `front/nginx.conf`
+
+La configuration Docker Compose (racine du projet) inclut le service frontend qui :
+
+- Build l'application
+- Sert les fichiers via Nginx sur le port 3000
+- Configure les redirections pour le routage SPA
+
+### Conventions de développement Frontend
+
+**Structure des composants** :
+
+- Composants partagés dans `components/`
+- Composants spécifiques à une page dans le fichier de route lui-même
+- Un composant par fichier
+- Utiliser des composants fonctionnels avec hooks
+
+**Gestion de l'état** :
+
+- État serveur : TanStack Query (queries/mutations)
+- État local : `useState`, `useReducer`
+- État global partagé : Context API (`AuthContext`)
+- Pas de Redux nécessaire pour ce projet
+
+**Style** :
+
+- Tailwind CSS pour le styling (classes utilitaires)
+- `cn()` helper pour combiner les classes conditionnellement
+- Pas de CSS modules ou styled-components
+- Composants shadcn/ui comme base
+
+**Types TypeScript** :
+
+- Types pour les réponses API dans `lib/api-types.ts`
+- Typage strict activé (`tsconfig.json`)
+- Éviter `any`, préférer `unknown` si nécessaire
+- Props des composants typées avec des interfaces
+
+**Navigation** :
+
+- Utiliser `<Link to="...">` de TanStack Router pour la navigation SPA
+- Éviter `<a href="...">` qui recharge la page
+- Paramètres d'URL typés via TanStack Router
+
+### Intégration API-Frontend
+
+Le frontend communique avec l'API backend via Axios :
+
+1. **Client API configuré** (`lib/api-client.ts`) :
+   - Base URL depuis `VITE_API_URL`
+   - Intercepteur qui ajoute le JWT aux requêtes
+   - Gestion centralisée des erreurs HTTP
+
+2. **Types partagés** (`lib/api-types.ts`) :
+   - Interfaces TypeScript pour les réponses de l'API
+   - Synchronisation manuelle avec les types backend
+
+3. **Hooks de requêtes** :
+   - Encapsulent les appels API dans des hooks TanStack Query
+   - Gèrent automatiquement le cache et les refetch
+   - Exemple : `useAccount()`, `usePosts()`, `usePost()`
+
+4. **Hooks de mutations** :
+   - Encapsulent les actions de modification (POST, PATCH, DELETE)
+   - Invalidation du cache après succès
+   - Exemple : `useCreatePost()`, `useUpdateAccount()`, `useFollowAccount()`
+
+Cette architecture découple la logique de récupération des données de l'UI, facilitant la maintenance et les tests.
