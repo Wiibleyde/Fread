@@ -1,5 +1,4 @@
-import axios, { type AxiosInstance, type AxiosError } from "axios";
-import { storage } from "./storage";
+import axios, { type AxiosError, type AxiosInstance } from "axios";
 import type {
 	AccountResponse,
 	CreatePostRequest,
@@ -29,6 +28,7 @@ import type {
 	UnlikeRequest,
 	UnlikeResponse,
 } from "./api-types";
+import { storage } from "./storage";
 
 const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -44,10 +44,8 @@ const createApiClient = (): AxiosInstance => {
 	client.interceptors.request.use(
 		(config) => {
 			const token = storage.getToken();
-			if (token && config.data) {
-				config.data = { ...config.data, token };
-			} else if (token && config.method === "get") {
-				config.data = { token };
+			if (token) {
+				config.headers.Authorization = `Bearer ${token}`;
 			}
 			return config;
 		},

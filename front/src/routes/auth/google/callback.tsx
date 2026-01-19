@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 import { authApi } from "@/lib/api-client";
@@ -12,9 +12,15 @@ export const Route = createFileRoute("/auth/google/callback")({
 function GoogleCallbackPage() {
 	const navigate = useNavigate();
 	const { login } = useAuth();
+	const hasHandledCallback = useRef(false);
 
 	useEffect(() => {
 		const handleCallback = async () => {
+			if (hasHandledCallback.current) {
+				return;
+			}
+			hasHandledCallback.current = true;
+
 			const urlParams = new URLSearchParams(window.location.search);
 			const code = urlParams.get("code");
 
