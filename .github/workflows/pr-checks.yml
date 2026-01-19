@@ -1,78 +1,99 @@
 name: PR Checks
 
 on:
-    pull_request:
-        branches:
-            - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-    tests-api:
-        name: Tests - Backend
-        runs-on: ubuntu-latest
+  tests-api:
+    name: Tests - Backend
+    runs-on: ubuntu-latest
 
-        services:
-            postgres:
-                image: postgres:16
-                env:
-                    POSTGRES_USER: fread_user
-                    POSTGRES_PASSWORD: fread_password
-                    POSTGRES_DB: fread_test_db
-                ports:
-                    - 5432:5432
-                options: >-
-                    --health-cmd "pg_isready -U fread_user"
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-
+    services:
+      postgres:
+        image: postgres:16
         env:
-            DATABASE_URL: postgresql://fread_user:fread_password@localhost:5432/fread_test_db
-            JWT_SECRET: test-jwt-secret-key-for-ci-minimum-32-characters
-            AUTH_DISCORD_ID: test-discord-id
-            AUTH_DISCORD_SECRET: test-discord-secret
-            DISCORD_REDIRECT_URI: http://localhost:3000/auth/discord/callback
-            AUTH_GOOGLE_ID: test-google-id
-            AUTH_GOOGLE_SECRET: test-google-secret
-            GOOGLE_REDIRECT_URI: http://localhost:3000/auth/google/callback
+          POSTGRES_USER: fread_user
+          POSTGRES_PASSWORD: fread_password
+          POSTGRES_DB: fread_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fread_user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    env:
+      DATABASE_URL: postgresql://fread_user:fread_password@localhost:5432/fread_test_db
+      JWT_SECRET: test-jwt-secret-key-for-ci-minimum-32-characters
+      AUTH_DISCORD_ID: test-discord-id
+      AUTH_DISCORD_SECRET: test-discord-secret
+      DISCORD_REDIRECT_URI: http://localhost:3000/auth/discord/callback
+      AUTH_GOOGLE_ID: test-google-id
+      AUTH_GOOGLE_SECRET: test-google-secret
+      GOOGLE_REDIRECT_URI: http://localhost:3000/auth/google/callback
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Install dependencies
-              working-directory: ./api
-              run: bun install
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-            - name: Generate Prisma Client
-              working-directory: ./api
-              run: bun run db:generate
+      - name: Install dependencies
+        working-directory: ./api
+        run: bun install
 
-            - name: Run tests
-              working-directory: ./api
-              run: bun test
+      - name: Generate Prisma Client
+        working-directory: ./api
+        run: bun run db:generate
 
-    biome-front:
-        name: Biome - Frontend
-        runs-on: ubuntu-latest
+      - name: Run tests
+        working-directory: ./api
+        run: bun test
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+  tests-front:
+    name: Tests - Frontend
+    runs-on: ubuntu-latest
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Install dependencies
-              working-directory: ./front
-              run: bun install
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-            - name: Run Biome check
-              working-directory: ./front
-              run: bun run check
+      - name: Install dependencies
+        working-directory: ./front
+        run: bun install
+
+      - name: Run tests
+        working-directory: ./front
+        run: bun run test
+
+  biome-front:
+    name: Biome - Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: ./front
+        run: bun install
+
+      - name: Run Biome check
+        working-directory: ./front
+        run: bun run check
