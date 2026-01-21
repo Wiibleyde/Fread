@@ -196,5 +196,23 @@ describe("account.service", () => {
             });
             expect(result).toBe(updated);
         });
+
+        it("convertit description null en chaîne vide", async () => {
+            const updated = { ...baseAccount, description: "" };
+            prismaMock.account.update.mockResolvedValue(updated);
+
+            await editAccountDb(accountId, {
+                description: null,
+            });
+
+            expect(prismaMock.account.update).toHaveBeenCalledWith({
+                where: { id: accountId },
+                data: {
+                    displayName: undefined,
+                    description: "",
+                    private: undefined,
+                },
+            });
+        });
     });
 });

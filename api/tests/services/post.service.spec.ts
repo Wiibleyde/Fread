@@ -142,12 +142,33 @@ describe("post.service", () => {
 
             const result = await getPostsByAccountId(accountId, accountId);
 
+            // Le code utilise un spread conditionnel, donc le OR contient { private: false } + { private: true } via spread
             expect(prismaMock.post.findMany).toHaveBeenCalledWith({
                 where: {
                     accountId,
                     OR: [
                         { private: false },
                         { private: true },
+                    ],
+                },
+                orderBy: {
+                    creationDate: "desc",
+                },
+            });
+            expect(result).toBe(posts);
+        });
+
+        it("retourne uniquement posts publics si viewerId non fourni", async () => {
+            const posts = [basePost];
+            prismaMock.post.findMany.mockResolvedValue(posts);
+
+            const result = await getPostsByAccountId(accountId);
+
+            expect(prismaMock.post.findMany).toHaveBeenCalledWith({
+                where: {
+                    accountId,
+                    OR: [
+                        { private: false },
                     ],
                 },
                 orderBy: {
