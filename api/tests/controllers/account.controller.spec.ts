@@ -1,3 +1,28 @@
+jest.mock("../../services/account.service", () => ({
+    getAccountByIdDB: jest.fn(),
+    deleteAccount: jest.fn(),
+    editAccountDb: jest.fn(),
+}));
+
+jest.mock("../../services/follow.service", () => ({
+    getFollowersByAccountId: jest.fn(),
+    getFollowersCount: jest.fn(),
+    getFollowingByAccountId: jest.fn(),
+    getFollowingCount: jest.fn(),
+    isFollowing: jest.fn(),
+}));
+
+jest.mock("../../services/like.service", () => ({
+    isPostLikedByAccountDB: jest.fn(),
+}));
+
+jest.mock("../../services/post.service", () => ({
+    getPostsByAccountId: jest.fn(),
+    getPostsCountByAccountId: jest.fn(),
+    getPostLikesCount: jest.fn(),
+    getPostRepliesCount: jest.fn(),
+}));
+
 import AccountController from "../../controllers/account.controller";
 import {
     deleteAccount,
@@ -20,24 +45,6 @@ import {
 } from "../../services/post.service";
 import ForbiddenError from "../../errors/forbidden.error";
 import InternalError from "../../errors/internal.error";
-
-jest.mock("../../services/account.service", () => ({
-    getAccountByIdDB: jest.fn(),
-    deleteAccount: jest.fn(),
-    editAccountDb: jest.fn(),
-}));
-
-jest.mock("../../services/follow.service", () => ({
-    getFollowersByAccountId: jest.fn(),
-    getFollowersCount: jest.fn(),
-    getFollowingByAccountId: jest.fn(),
-    getFollowingCount: jest.fn(),
-    isFollowing: jest.fn(),
-}));
-
-jest.mock("../../services/like.service", () => ({
-    isPostLikedByAccountDB: jest.fn(),
-}));
 
 jest.mock("../../services/post.service", () => ({
     getPostLikesCount: jest.fn(),

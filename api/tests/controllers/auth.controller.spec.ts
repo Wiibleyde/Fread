@@ -1,19 +1,3 @@
-import AuthController from "../../controllers/auth.controller";
-import {
-    getAccountByDiscordIdDB,
-    getAccountByGoogleIdDB,
-} from "../../services/account.service";
-import {
-    buildAuthUrl,
-    createUser,
-    getAccessTokenFromCallback,
-    getCodeFromCallback,
-    getUserInfo,
-} from "../../services/oauth.service";
-import { generateJWT } from "../../utils/jwt";
-import InternalError from "../../errors/internal.error";
-import type { Request } from "express";
-
 jest.mock("../../services/account.service", () => ({
     getAccountByDiscordIdDB: jest.fn(),
     getAccountByGoogleIdDB: jest.fn(),
@@ -30,6 +14,22 @@ jest.mock("../../services/oauth.service", () => ({
 jest.mock("../../utils/jwt", () => ({
     generateJWT: jest.fn(),
 }));
+
+import AuthController from "../../controllers/auth.controller";
+import {
+    getAccountByDiscordIdDB,
+    getAccountByGoogleIdDB,
+} from "../../services/account.service";
+import {
+    buildAuthUrl,
+    createUser,
+    getAccessTokenFromCallback,
+    getCodeFromCallback,
+    getUserInfo,
+} from "../../services/oauth.service";
+import { generateJWT } from "../../utils/jwt";
+import InternalError from "../../errors/internal.error";
+import type { Request } from "express";
 
 const mockedBuildAuthUrl = buildAuthUrl as jest.MockedFunction<
     typeof buildAuthUrl

@@ -1,3 +1,9 @@
+jest.mock("../../services/like.service", () => ({
+    likePostDB: jest.fn(),
+    unlikePostDB: jest.fn(),
+    isPostLikedByAccountDB: jest.fn(),
+}));
+
 import LikeController from "../../controllers/like.controller";
 import {
     isPostLikedByAccountDB,
@@ -7,12 +13,6 @@ import {
 import InternalError from "../../errors/internal.error";
 import BadRequestError from "../../errors/badrequest.error";
 import type { AuthenticatedRequest } from "../../models/auth.model";
-
-jest.mock("../../services/like.service", () => ({
-    likePostDB: jest.fn(),
-    unlikePostDB: jest.fn(),
-    isPostLikedByAccountDB: jest.fn(),
-}));
 
 const mockedLikePostDB = likePostDB as jest.MockedFunction<typeof likePostDB>;
 const mockedUnlikePostDB =

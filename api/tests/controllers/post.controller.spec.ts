@@ -1,22 +1,3 @@
-import PostController from "../../controllers/post.controller";
-import BadRequestError from "../../errors/badrequest.error";
-import InternalError from "../../errors/internal.error";
-import NotFoundError from "../../errors/notfound.error";
-import UnauthorizedError from "../../errors/unauthorized.error";
-import { isFollowing } from "../../services/follow.service";
-import { isPostLikedByAccountDB } from "../../services/like.service";
-import {
-    createPostDB,
-    createReplyDB,
-    deletePostByIdDb,
-    editPostById,
-    getFeedPosts,
-    getPostById,
-    getPostLikesCount,
-    getPostRepliesCount,
-    getRepliesForPost,
-} from "../../services/post.service";
-
 jest.mock("../../services/post.service", () => ({
     createPostDB: jest.fn(),
     createReplyDB: jest.fn(),
@@ -36,6 +17,25 @@ jest.mock("../../services/like.service", () => ({
 jest.mock("../../services/follow.service", () => ({
     isFollowing: jest.fn(),
 }));
+
+import PostController from "../../controllers/post.controller";
+import BadRequestError from "../../errors/badrequest.error";
+import InternalError from "../../errors/internal.error";
+import NotFoundError from "../../errors/notfound.error";
+import UnauthorizedError from "../../errors/unauthorized.error";
+import { isFollowing } from "../../services/follow.service";
+import { isPostLikedByAccountDB } from "../../services/like.service";
+import {
+    createPostDB,
+    createReplyDB,
+    deletePostByIdDb,
+    editPostById,
+    getFeedPosts,
+    getPostById,
+    getPostLikesCount,
+    getPostRepliesCount,
+    getRepliesForPost,
+} from "../../services/post.service";
 
 const mockedCreatePostDB = createPostDB as jest.MockedFunction<
     typeof createPostDB

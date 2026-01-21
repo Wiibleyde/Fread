@@ -1,3 +1,14 @@
+jest.mock("../../services/account.service", () => ({
+    getAccountByIdDB: jest.fn(),
+}));
+
+jest.mock("../../services/follow.service", () => ({
+    followAccountDB: jest.fn(),
+    unfollowAccount: jest.fn(),
+    getFollowersByAccountId: jest.fn(),
+    getFollowingByAccountId: jest.fn(),
+}));
+
 import FollowController from "../../controllers/follow.controller";
 import { getAccountByIdDB } from "../../services/account.service";
 import {
@@ -11,17 +22,6 @@ import NotFoundError from "../../errors/notfound.error";
 import InternalError from "../../errors/internal.error";
 import type { AuthenticatedRequest } from "../../models/auth.model";
 import type { Request } from "express";
-
-jest.mock("../../services/account.service", () => ({
-    getAccountByIdDB: jest.fn(),
-}));
-
-jest.mock("../../services/follow.service", () => ({
-    followAccountDB: jest.fn(),
-    unfollowAccount: jest.fn(),
-    getFollowersByAccountId: jest.fn(),
-    getFollowingByAccountId: jest.fn(),
-}));
 
 const mockedGetAccountByIdDB = getAccountByIdDB as jest.MockedFunction<
     typeof getAccountByIdDB
