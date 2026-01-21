@@ -9,7 +9,8 @@ const globalForPrisma = globalThis as unknown as {
 	prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
-const logger = Logger.for(import.meta.url);
+// Note: on évite import.meta ici pour rester compatible avec la config TS/Jest
+const logger = new Logger("prisma");
 
 function createPrismaClient() {
 	const pool = new Pool({ connectionString: process.env.DATABASE_URL });
