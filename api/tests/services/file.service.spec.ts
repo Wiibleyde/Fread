@@ -1,9 +1,9 @@
 import { prisma } from "../../prisma";
 import {
-    createFileDB,
-    deleteFileDB,
-    getFileByIdDB,
-    getProfilePictureByProfileForIdDB,
+  createFileDB,
+  deleteFileDB,
+  getFileByIdDB,
+  getProfilePictureByProfileForIdDB,
 } from "../../services/file.service";
 
 const accountId = "acc_01FZACCOUNT123456789";

@@ -5,7 +5,7 @@ import type { AuthenticatedRequest } from "../models/auth.model";
 import { Logger } from "../utils/logger";
 import UnauthorizedError from "../errors/unauthorized.error";
 
-const log = Logger.for(import.meta.url);
+const log = Logger.here();
 
 export const authMiddleware: RequestHandler = async (
     req: Request,

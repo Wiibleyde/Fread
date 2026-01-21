@@ -14,7 +14,7 @@ import {
 import { generateJWT } from "../utils/jwt";
 import { Logger } from "../utils/logger";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 class AuthController {
 	private provider: "discord" | "google";

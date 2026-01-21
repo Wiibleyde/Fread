@@ -1,7 +1,7 @@
 import { prisma } from "../prisma";
 import { Logger } from "./logger";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 export const dbHealthCheck = async () => {
     try {

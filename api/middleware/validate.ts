@@ -3,7 +3,7 @@ import type { ZodTypeAny } from "zod";
 import BadRequestError from "../errors/badrequest.error";
 import { Logger } from "../utils/logger";
 
-const log = Logger.for(import.meta.url);
+const log = Logger.here();
 
 function makeValidator(getPart: (req: Request) => unknown, setPart?: (req: Request, value: unknown) => void) {
     return (schema: ZodTypeAny, label: string): RequestHandler => {

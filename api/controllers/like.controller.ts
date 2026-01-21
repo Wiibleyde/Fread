@@ -4,7 +4,7 @@ import type { AuthenticatedRequest } from "../models/auth.model";
 import { isPostLikedByAccountDB, likePostDB, unlikePostDB } from "../services/like.service";
 import { Logger } from "../utils/logger";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 
 class LikeController {

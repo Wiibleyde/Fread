@@ -1,8 +1,8 @@
 import { prisma } from "../../prisma";
 import {
-    likePostDB,
-    isPostLikedByAccountDB,
-    unlikePostDB,
+  likePostDB,
+  isPostLikedByAccountDB,
+  unlikePostDB,
 } from "../../services/like.service";
 
 const accountId = "acc_01FZACCOUNT123456789";

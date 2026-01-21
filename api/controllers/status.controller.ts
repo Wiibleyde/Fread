@@ -1,7 +1,7 @@
 import type { Request } from "express";
 import { Logger } from "../utils/logger";
 
-const logger = new Logger(import.meta.url);
+const logger = Logger.here();
 
 
 class StatusController {
