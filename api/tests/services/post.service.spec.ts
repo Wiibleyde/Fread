@@ -1,3 +1,33 @@
+jest.mock("../../prisma", () => ({
+    prisma: {
+        post: {
+            create: jest.fn(),
+            findMany: jest.fn(),
+            findUnique: jest.fn(),
+            delete: jest.fn(),
+            update: jest.fn(),
+            count: jest.fn(),
+        },
+        reply: {
+            create: jest.fn(),
+            findMany: jest.fn(),
+            count: jest.fn(),
+        },
+        like: {
+            count: jest.fn(),
+            findUnique: jest.fn(),
+        },
+        account: {
+            findUnique: jest.fn(),
+        },
+        $transaction: jest.fn(),
+    },
+}));
+
+jest.mock("../../services/follow.service", () => ({
+    getFollowingIds: jest.fn(),
+}));
+
 import { prisma } from "../../prisma";
 import {
     createPostDB,
@@ -12,6 +42,7 @@ import {
     getPostsCountByAccountId,
     getFeedPosts,
 } from "../../services/post.service";
+import { getFollowingIds } from "../../services/follow.service";
 
 const accountId = "acc_01FZACCOUNT123456789";
 const otherAccountId = "acc_01FZACCOUNT987654321";
@@ -41,34 +72,6 @@ const baseReply = {
     replyPostId,
 };
 
-jest.mock("../../prisma", () => ({
-    prisma: {
-        post: {
-            create: jest.fn(),
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            delete: jest.fn(),
-            update: jest.fn(),
-            count: jest.fn(),
-        },
-        reply: {
-            findMany: jest.fn(),
-            count: jest.fn(),
-            create: jest.fn(),
-        },
-        like: {
-            count: jest.fn(),
-        },
-        $transaction: jest.fn(),
-    },
-}));
-
-jest.mock("../../services/follow.service", () => ({
-    getFollowingIds: jest.fn(),
-}));
-
-import { getFollowingIds } from "../../services/follow.service";
-
 const prismaMock = prisma as unknown as {
     post: {
         create: jest.Mock;
@@ -85,6 +88,10 @@ const prismaMock = prisma as unknown as {
     };
     like: {
         count: jest.Mock;
+        findUnique: jest.Mock;
+    };
+    account: {
+        findUnique: jest.Mock;
     };
     $transaction: jest.Mock;
 };

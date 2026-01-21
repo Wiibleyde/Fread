@@ -1,3 +1,18 @@
+jest.mock("../../prisma", () => ({
+    prisma: {
+        follow: {
+            upsert: jest.fn(),
+            delete: jest.fn(),
+            findUnique: jest.fn(),
+            count: jest.fn(),
+            findMany: jest.fn(),
+        },
+        account: {
+            findUnique: jest.fn(),
+        },
+    },
+}));
+
 import { prisma } from "../../prisma";
 import {
     followAccountDB,

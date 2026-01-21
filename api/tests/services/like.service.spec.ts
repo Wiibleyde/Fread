@@ -1,3 +1,13 @@
+jest.mock("../../prisma", () => ({
+  prisma: {
+    like: {
+      upsert: jest.fn(),
+      findUnique: jest.fn(),
+      delete: jest.fn(),
+    },
+  },
+}));
+
 import { prisma } from "../../prisma";
 import {
   likePostDB,
@@ -16,16 +26,6 @@ const baseLike = {
   postId,
   createdAt: baseDate,
 };
-
-jest.mock("../../prisma", () => ({
-  prisma: {
-    like: {
-      upsert: jest.fn(),
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-  },
-}));
 
 const prismaMock = prisma as unknown as {
   like: {

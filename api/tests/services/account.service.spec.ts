@@ -1,3 +1,17 @@
+jest.mock("../../prisma", () => ({
+    prisma: {
+        account: {
+            create: jest.fn(),
+            findUnique: jest.fn(),
+            delete: jest.fn(),
+            update: jest.fn(),
+        },
+        file: {
+            findUnique: jest.fn(),
+        },
+    },
+}));
+
 import { prisma } from "../../prisma";
 import {
     createAccountDB,

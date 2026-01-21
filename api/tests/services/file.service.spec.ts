@@ -1,3 +1,13 @@
+jest.mock("../../prisma", () => ({
+  prisma: {
+    file: {
+      create: jest.fn(),
+      delete: jest.fn(),
+      findUnique: jest.fn(),
+    },
+  },
+}));
+
 import { prisma } from "../../prisma";
 import {
   createFileDB,
@@ -18,16 +28,6 @@ const baseFile = {
   fileName: "avatar.png",
   profileForId: accountId,
 };
-
-jest.mock("../../prisma", () => ({
-  prisma: {
-    file: {
-      create: jest.fn(),
-      delete: jest.fn(),
-      findUnique: jest.fn(),
-    },
-  },
-}));
 
 const prismaMock = prisma as unknown as {
   file: {
