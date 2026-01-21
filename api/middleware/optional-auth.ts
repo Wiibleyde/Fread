@@ -4,7 +4,7 @@ import { authenticateUser } from "../services/auth.service";
 import type { AuthenticatedRequest } from "../models/auth.model";
 import { Logger } from "../utils/logger";
 
-const log = Logger.for(import.meta.url);
+const log = Logger.here();
 
 export const optionalAuthMiddleware: RequestHandler = async (
     req: Request,

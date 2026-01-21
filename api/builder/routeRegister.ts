@@ -7,7 +7,7 @@ export function registerRoutes(
     routes: RouteDescriptor[]
 ) {
 
-    const logger = Logger.for(import.meta.url);
+    const logger = Logger.here();
 
     routes.forEach(route => {
         logger.debug(`Registering route [${route.method.toUpperCase()}] ${route.path}`);

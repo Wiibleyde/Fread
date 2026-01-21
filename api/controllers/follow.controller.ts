@@ -12,7 +12,7 @@ import {
 } from "../services/follow.service";
 import { Logger } from "../utils/logger";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 class FollowController {
 	followAccount = async (req: AuthenticatedRequest) => {

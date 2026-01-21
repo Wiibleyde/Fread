@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./api
-        run: bun test
+        run: bun test:coverage
 
   tests-front:
     name: Tests - Frontend

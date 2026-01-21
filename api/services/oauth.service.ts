@@ -2,9 +2,9 @@ import type { Request } from "express";
 import { env } from "../env";
 import type { Account } from "../generated/prisma/client";
 import type {
-	DiscordUser,
-	GoogleUser,
-	OauthInfos,
+    DiscordUser,
+    GoogleUser,
+    OauthInfos,
 } from "../models/account.model";
 import { prisma } from "../prisma";
 import { createAccountDB, getAccountByUsernameDB } from "./account.service";
@@ -63,7 +63,10 @@ export const getAccessTokenFromCallback = async (
 			throw new Error(`Token exchange failed: ${errorText}`);
 		}
 
-		const tokenData = await tokenResponse.json();
+		const tokenData = (await tokenResponse.json()) as {
+			access_token?: string;
+			token_type?: string;
+		};
 
 		if (!tokenData.access_token) {
 			throw new Error(
@@ -97,7 +100,10 @@ export const getAccessTokenFromCallback = async (
 			throw new Error(`Token exchange failed: ${errorText}`);
 		}
 
-		const tokenData = await tokenResponse.json();
+		const tokenData = (await tokenResponse.json()) as {
+			access_token?: string;
+			token_type?: string;
+		};
 
 		if (!tokenData.access_token) {
 			throw new Error(

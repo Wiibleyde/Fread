@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import AppError from "../errors/AppError";
 import { Logger } from "../utils/logger";
 
-const log = Logger.for(import.meta.url);
+const log = Logger.here();
 
 export function errorMiddleware(
     err: Error,

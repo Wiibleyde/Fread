@@ -24,7 +24,7 @@ import {
 } from "../services/post.service";
 import { Logger } from "../utils/logger";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 class AccountController {
 	getProfile = async (req: AuthenticatedRequest) => {

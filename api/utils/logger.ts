@@ -37,6 +37,30 @@ export class Logger {
     readonly name: string;
     readonly minLevel: Level;
 
+    static here(minLevel?: Level) {
+        const err = new Error();
+        const stack = err.stack?.split("\n") ?? [];
+        // on prend la ligne appelante (après Error + Logger.here)
+        const stackLine = stack[2] ?? "";
+
+        // Forme la plus courante : "at Object.<anonymous> (/abs/path/file.js:4:23)"
+        let filePath: string | undefined;
+        const matchWithParens = stackLine.match(/\((.*):\d+:\d+\)/);
+        if (matchWithParens?.[1]) {
+            filePath = matchWithParens[1];
+        } else {
+            // Autre forme possible : "at /abs/path/file.js:4:23"
+            const matchNoParens = stackLine.match(/at (.*):\d+:\d+/);
+            if (matchNoParens?.[1]) {
+                filePath = matchNoParens[1];
+            }
+        }
+
+        const absPath = filePath ?? "unknown";
+        const rel = path.relative(process.cwd(), absPath) || absPath;
+        return new Logger(rel, minLevel);
+    }
+
     constructor(name: string, minLevel?: Level) {
         const envLevel = (process.env.LOG_LEVEL as Level) || "debug";
         this.name = name;
@@ -56,6 +80,9 @@ export class Logger {
     }
 
     private write(level: Level, parts: unknown[]) {
+        // Ne rien loguer pendant les tests (Jest)
+        if (process.env.NODE_ENV === "test") return;
+
         if (!this.shouldLog(level)) return;
 
         const ts = `[${nowISO()}]`;

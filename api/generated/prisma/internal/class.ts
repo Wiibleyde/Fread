@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace.ts"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.0.1",
-  "engineVersion": "f09f2815f091dbba658cdcd2264306d88bb5bda6",
+  "clientVersion": "7.2.0",
+  "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Account {\n  id               String    @id @default(cuid())\n  username         String    @unique\n  displayName      String\n  profilePicture   File?     @relation(\"ProfilePicture\", fields: [profilePictureId], references: [id], onDelete: SetNull)\n  profilePictureId String?   @unique\n  description      String\n  private          Boolean   @default(false)\n  profileCompleted Boolean   @default(false)\n  appleId          String?   @unique\n  googleId         String?   @unique\n  discordId        String?   @unique\n  admin            Boolean   @default(false)\n  createdAt        DateTime  @default(now())\n  updatedAt        DateTime? @updatedAt\n\n  // Relations\n  likes      Like[]\n  posts      Post[]\n  follows    Follow[] @relation(\"Follower\")\n  followedBy Follow[] @relation(\"Followed\")\n  files      File[]   @relation(\"AccountFiles\")\n}\n\nmodel Post {\n  id           String   @id @default(cuid())\n  account      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)\n  accountId    String\n  creationDate DateTime @default(now())\n  content      String\n  attachments  File[]   @relation(\"PostAttachments\")\n  private      Boolean  @default(false)\n\n  // Relations\n  likes   Like[]\n  replies Reply[] @relation(\"BasePost\")\n  replyTo Reply?  @relation(\"ReplyPost\")\n}\n\nmodel File {\n  id           String   @id @default(cuid())\n  account      Account  @relation(\"AccountFiles\", fields: [accountId], references: [id], onDelete: Cascade)\n  accountId    String\n  creationDate DateTime @default(now())\n  fileName     String\n\n  // Relations\n  posts        Post[]   @relation(\"PostAttachments\")\n  profileFor   Account? @relation(\"ProfilePicture\")\n  profileForId String?  @unique\n}\n\nmodel Reply {\n  id          String @id @default(cuid())\n  basePost    Post   @relation(\"BasePost\", fields: [basePostId], references: [id], onDelete: Cascade)\n  basePostId  String\n  replyPost   Post   @relation(\"ReplyPost\", fields: [replyPostId], references: [id], onDelete: Cascade)\n  replyPostId String @unique\n}\n\nmodel Like {\n  id        String   @id @default(cuid())\n  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)\n  accountId String\n  post      Post     @relation(fields: [postId], references: [id])\n  postId    String\n  createdAt DateTime @default(now())\n\n  @@unique([accountId, postId])\n}\n\nmodel Follow {\n  id                String   @id @default(cuid())\n  account           Account  @relation(\"Follower\", fields: [accountId], references: [id], onDelete: Cascade)\n  accountId         String\n  followedAccount   Account  @relation(\"Followed\", fields: [followedAccountId], references: [id], onDelete: Cascade)\n  followedAccountId String\n  createdAt         DateTime @default(now())\n\n  @@unique([accountId, followedAccountId])\n}\n",
   "runtimeDataModel": {
@@ -62,7 +62,7 @@ export interface PrismaClientConstructor {
    * const accounts = await prisma.account.findMany()
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   new <
@@ -84,7 +84,7 @@ export interface PrismaClientConstructor {
  * const accounts = await prisma.account.findMany()
  * ```
  * 
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 
 export interface PrismaClient<
@@ -113,7 +113,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -125,7 +125,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -136,7 +136,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -148,7 +148,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 

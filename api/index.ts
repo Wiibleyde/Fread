@@ -11,7 +11,7 @@ import { dbHealthCheck } from "./utils/db";
 import { Logger } from "./utils/logger";
 import statusRouter from "./routes/status";
 
-const logger = Logger.for(import.meta.url);
+const logger = Logger.here();
 
 const app = express();
 app.use(express.json());
