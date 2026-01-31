@@ -72,6 +72,21 @@ Une description technique du projet est disponible : langage utilisé, framework
 - Git pour cloner le dépôt.
 - Discord Developer Portal / Google Cloud Console pour obtenir les identifiants OAuth si vous souhaitez tester l'authentification via ces fournisseurs.
 
+
+#### Création OAuth Discord
+1. Aller sur le [Discord Developer Portal](https://discord.com/developers/applications).
+2. Créer une nouvelle application.
+3. Dans l'onglet "OAuth2", ajouter une redirection avec l'URL `http://localhost:{PORT_FRONT}/auth/discord/callback` (remplacer `{PORT_FRONT}` par le port utilisé par le frontend, généralement `3000`).
+4. Noter l'`Client ID` et le `Client Secret` pour la configuration.
+
+#### Création OAuth Google
+1. Aller sur la [Google Cloud Console](https://console.cloud.google.com/).
+2. Créer un nouveau projet.
+3. Activer l'API "Google+ API" ou "People API".
+4. Dans les "Identifiants", créer un identifiant OAuth 2.0 avec une redirection `http://localhost:{PORT_FRONT}/auth/google/callback`.
+5. Ajouter l'url Javascript autorisée `http://localhost:{PORT_BACK}` afin d'autoriser l'API backend à communiquer avec Google.
+6. Noter l'`Client ID` et le `Client Secret` pour la configuration.
+
 ### Lancer l'API et la base de données avec Docker
 
 Le projet peut être lancé entièrement via Docker (API + base PostgreSQL) grâce au fichier `docker-compose.yml` à la racine.
