@@ -99,6 +99,8 @@ Le projet peut être lancé entièrement via Docker (API + base PostgreSQL) grâ
 - `AUTH_DISCORD_ID` / `AUTH_DISCORD_SECRET` / `DISCORD_REDIRECT_URI` : identifiants OAuth Discord et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Discord, `http://localhost:{PORT_FRONT}/auth/discord/callback`.
 - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` / `GOOGLE_REDIRECT_URI` : identifiants OAuth Google et URL de redirection. Mettre vos vraies valeurs si vous testez l'auth Google , `http://localhost:{PORT_FRONT}/auth/google/callback`.
 
+Voir le fichier [api/.env.example](api/.env.example) pour un exemple de configuration.
+
 2. **Construire les images et démarrer les conteneurs** (depuis la racine du projet) :
 
 ```bash
