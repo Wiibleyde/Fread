@@ -135,6 +135,7 @@ Cela démarre :
 
 - un conteneur `postgres` avec la base `fread_db` ;
 - un conteneur `api` qui génère le client Prisma, applique les migrations puis lance l'API Express.
+- un conteneur `front` qui sert l'application frontend (accessible sur `http://localhost:3000` par défaut).
 
 3. **Vérifier que l'API est en ligne** :
 
