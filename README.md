@@ -63,26 +63,264 @@ Une description technique du projet est disponible : langage utilisé, framework
   - Outils de développement : Bun pour la gestion des scripts et des dépendances.
 
 ### Styles Architecturaux
-- Architecture en couches (Layered Architecture) 
+
+#### Architecture en couches (Layered Architecture) 
 
 Séparation claire entre les différentes couches de l'application : présentation (routes/controllers), logique métier (services) et accès aux données (Prisma), nécessaire dans une API REST afin de maintenir un code propre, modulaire et facile à maintenir. Depuis l'implémentation de cette architecture, il est plus simple d'ajouter de nouvelles fonctionnalités (20 minutes pour ajouter une nouvelle fonctionnalité complète avec routes, contrôleurs, services, validation) et de tester chaque couche indépendamment (tests unitaires des services sans dépendance aux routes ou à la base de données).
 
-- Clean Architecture
+**Exemple de cheminement à travers les couches** :
+
+**1. Couche Présentation (Routes)** - Définition de l'endpoint et des middlewares
+
+`api/routes/account/account.route.ts`
+```typescript
+{
+  method: "get",
+  path: "/account/:id",
+  middlewares: [
+    validateParams(idParamSchema, "params"),
+    optionalAuthMiddleware,
+  ],
+  handler: asyncHandler(async (req, res) => {
+    const result = await controller.getProfile(req as AuthenticatedRequest);
+    res.json(result);
+  }),
+}
+```
+
+**2. Couche Logique Métier (Controller)** - Orchestration de la logique
+
+`api/controllers/account.controller.ts`
+```typescript
+class AccountController {
+  getProfile = async (req: AuthenticatedRequest) => {
+    const id = req.params.id;
+    const viewerId = req.account?.id;
+
+    logger.debug("Retrieving profile");
+    const account = await getAccountByIdDB(id);
+    
+    if (!account) {
+      return { account: null, retrieved: false };
+    }
+    
+    // Logique métier : vérification des permissions, agrégation de données
+    const postsCount = await getPostsCountByAccountId(id);
+    const followersCount = await getFollowersCount(id);
+    // ... retour des données formatées
+  }
+}
+```
+
+**3. Couche Accès aux Données (Service)** - Interaction avec la base de données
+
+`api/services/account.service.ts`
+```typescript
+export const getAccountByIdDB = (id: string) => {
+  return prisma.account.findUnique({
+    where: { id },
+  });
+};
+```
+
+#### Clean Architecture
 
 Dans la suite logique de l'architecture en couches, la Clean Architecture est appliquée pour garantir que les dépendances pointent vers l'intérieur (les couches internes ne dépendent pas des couches externes). Cela permet de rendre la logique métier indépendante des frameworks et des technologies spécifiques (Express, Prisma), facilitant ainsi les tests unitaires et la maintenance du code. Par exemple, les services ne dépendent pas directement d'Express ou de Prisma, mais utilisent des interfaces ou des abstractions, ce qui permet de remplacer facilement ces dépendances si nécessaire.
 
+**Illustration du principe d'inversion de dépendances** :
+
+`api/services/account.service.ts` - Les services ne dépendent que de types métier
+```typescript
+// CreateAccountData est un type indépendant du framework
+export const createAccountDB = (data: CreateAccountData) => {
+  return prisma.account.create({
+    data: {
+      username: data.username,
+      displayName: data.displayName,
+      // ... structure métier pure
+    },
+  });
+};
+```
+
+`api/controllers/account.controller.ts` - Le contrôleur adapte HTTP vers la logique métier
+```typescript
+class AccountController {
+  getProfile = async (req: AuthenticatedRequest) => {
+    // Extraction des données HTTP
+    const id = req.params.id;
+    const viewerId = req.account?.id;
+    
+    // Appel de la logique métier (indépendante d'Express)
+    const account = await getAccountByIdDB(id);
+    
+    // Formatage de la réponse HTTP
+    return { account, retrieved: true };
+  }
+}
+```
+
 ### Design Patterns
-- Singleton (pour la gestion de la connexion à la base de données)
+
+#### Singleton (pour la gestion de la connexion à la base de données)
 
 L'utilisation d'un singleton pour la connexion à la base de données garantit qu'une seule instance de la connexion est créée et partagée à travers toute l'application. Cela permet d'optimiser les ressources et d'éviter les problèmes liés à la gestion de multiples connexions simultanées, ainsi que d'éviter d'ouvrir plusieurs connexions inutiles à la base de données, ce qui pourrait entraîner des dépassements de limites ou des performances dégradées.
 
-- Builder (création des routes)
+**Implémentation du Singleton Prisma** :
+
+`api/prisma.ts`
+```typescript
+const globalForPrisma = globalThis as unknown as {
+  prisma: ReturnType<typeof createPrismaClient> | undefined;
+};
+
+function createPrismaClient() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({
+    adapter,
+    log: [{ emit: "event", level: "query" }],
+  });
+}
+
+// ✨ Singleton : réutilise l'instance existante ou en crée une nouvelle
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+
+// En développement, stocke l'instance dans globalThis pour persister entre les rechargements
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+```
+
+Utilisation dans tous les services :
+```typescript
+import { prisma } from "../prisma"; // ✅ Toujours la même instance
+```
+
+#### Builder (création des routes)
 
 Le builder de routes permet de centraliser et de standardiser la création des routes de l'API. En utilisant un pattern builder, on peut définir des configurations communes pour les routes (comme les middlewares, les contrôleurs associés, la méthode d'appel, ainsi que l'URL avec les paramètres dynamiques) et les réutiliser facilement. Cela améliore la maintenabilité du code, si un jour on a besoin de changer de technologie de routage ou d'ajouter des fonctionnalités communes à toutes les routes, on n'a qu'à modifier le builder.
 
-- Factory (création des services)
+**Implémentation du Builder de routes** :
+
+`api/models/route.model.ts` - Structure déclarative d'une route
+```typescript
+export interface RouteDescriptor {
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete';
+  path: string;
+  middlewares?: RequestHandler[];
+  handler: RequestHandler;
+}
+```
+
+`api/builder/routeRegister.ts` - Builder qui enregistre les routes
+```typescript
+export function registerRoutes(router: Router, routes: RouteDescriptor[]) {
+  routes.forEach(route => {
+    logger.debug(`Registering route [${route.method.toUpperCase()}] ${route.path}`);
+    router[route.method](
+      route.path,
+      ...(route.middlewares ?? []),
+      route.handler
+    );
+  });
+}
+```
+
+`api/routes/account/account.route.ts` - Utilisation du builder
+```typescript
+const createAccountRoutes = (): RouteDescriptor[] => {
+  const controller = new AccountController();
+  const prefix = "/account";
+
+  return [
+    {
+      method: "get",
+      path: `${prefix}/:id`,
+      middlewares: [validateParams(idParamSchema), optionalAuthMiddleware],
+      handler: asyncHandler(async (req, res) => {
+        const result = await controller.getProfile(req);
+        res.json(result);
+      }),
+    },
+    {
+      method: "patch",
+      path: `${prefix}`,
+      middlewares: [authMiddleware, validateBody(accountEditSchema)],
+      handler: asyncHandler(async (req, res) => {
+        const result = await controller.editAccount(req);
+        res.json(result);
+      }),
+    },
+    // ... autres routes
+  ];
+};
+```
+
+`api/index.ts` - Enregistrement des routes via le builder
+```typescript
+import { registerRoutes } from "./builder/routeRegister";
+
+const accountRouter = express.Router();
+registerRoutes(accountRouter, createAccountRoutes());
+app.use(accountRouter);
+```
+
+#### Factory (création des services)
 
 Le pattern factory est utilisé pour la création des services afin d'encapsuler la logique de création et de configuration des instances de services. Cela permet de centraliser la gestion des dépendances et de faciliter le test unitaire en permettant l'injection de dépendances mockées. Les tests unitaires sont plus simples à écrire et à maintenir, étant que l'on teste la logique métier des services sans se soucier de la manière dont ils sont instanciés.
+
+**Implémentation du pattern Factory** :
+
+`api/services/account.service.ts` - Services exportés comme factory functions
+```typescript
+export const getAccountByIdDB = (id: string) => {
+  return prisma.account.findUnique({ where: { id } });
+};
+
+export const createAccountDB = (data: CreateAccountData) => {
+  return prisma.account.create({ data });
+};
+```
+
+`api/controllers/account.controller.ts` - Le contrôleur utilise les factories
+```typescript
+class AccountController {
+  getProfile = async (req: AuthenticatedRequest) => {
+    const id = req.params.id;
+    const viewerId = req.account?.id;
+
+    // Appels aux différents services (factory functions)
+    const account = await getAccountByIdDB(id);
+    const postsCount = await getPostsCountByAccountId(id);
+    const followersCount = await getFollowersCount(id);
+    const followingCount = await getFollowingCount(id);
+    
+    // Assemblage et retour du résultat
+    return {
+      account: {
+        ...account,
+        postsCount,
+        followersCount,
+        followingCount,
+      },
+      retrieved: true
+    };
+  }
+}
+```
+
+`api/tests/services/account.service.spec.ts` - Facilité de mock pour les tests
+```typescript
+jest.mock("../prisma", () => ({
+  prisma: {
+    account: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    }
+  }
+}));
+```
 
 
 ## Instructions d'installation
