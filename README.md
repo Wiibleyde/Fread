@@ -4,7 +4,8 @@
 
 | Document | Description | Public cible |
 |----------|-------------|--------------|
-| **[README.md](README.md)** | Vue d'ensemble du projet, installation rapide, démarrage | Tous |
+| **[README.md](README.md)** | Vue d'ensemble du projet, démarrage rapide | Tous |
+| **[INSTALLATION.md](INSTALLATION.md)** | Guide d'installation complet : Docker, local, OAuth, dépannage | Tous |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Architecture complète : styles architecturaux, design patterns, flux de données | Architectes, développeurs |
 | **[MANUEL_UTILISATEUR.md](MANUEL_UTILISATEUR.md)** | Guide complet d'utilisation de l'application et de l'API | Utilisateurs finaux, testeurs |
 | **[MANUEL_DEVELOPPEUR.md](MANUEL_DEVELOPPEUR.md)** | Documentation technique détaillée, conventions de code, contribution | Développeurs, contributeurs |
@@ -69,13 +70,7 @@ Fread est une application de réseau social qui permet aux utilisateurs de parta
 
 ## Installation
 
-### Prérequis
-
-- [Docker](https://www.docker.com/) + Docker Compose (recommandé)
-- OU [Bun](https://bun.sh/) + [Node.js](https://nodejs.org/) v18+ + PostgreSQL 16
-- Pour OAuth : comptes Discord Developer et/ou Google Cloud Console
-
-### Installation avec Docker (recommandé)
+### Démarrage rapide avec Docker
 
 ```bash
 # Cloner le dépôt
@@ -90,43 +85,7 @@ docker compose up -d
 **L'API est accessible sur** `http://localhost:3001`  
 **Le frontend est accessible sur** `http://localhost:3000`
 
-### Installation locale
-
-**Backend (API)**
-
-```bash
-cd api
-bun install
-cp .env.example .env
-# Éditer .env avec vos variables (DATABASE_URL, JWT_SECRET, OAuth IDs, etc.)
-bun run db:generate  # Générer le client Prisma
-bun run db:migrate   # Appliquer les migrations
-bun run index.ts     # Démarrer le serveur
-```
-
-**Frontend**
-
-```bash
-cd front
-bun install
-cp .env.example .env.local
-# Éditer .env.local avec l'URL de l'API
-bun run dev  # Démarrer sur http://localhost:3000
-```
-
-### Configuration OAuth
-
-**Discord** : [Discord Developer Portal](https://discord.com/developers/applications)
-- Créer une application
-- Ajouter redirect URI : `http://localhost:3000/auth/discord/callback`
-- Noter Client ID et Client Secret
-
-**Google** : [Google Cloud Console](https://console.cloud.google.com/)
-- Créer un projet et activer People API
-- Créer identifiant OAuth 2.0
-- Ajouter redirect URI : `http://localhost:3000/auth/google/callback`
-- Ajouter URL Javascript autorisée : `http://localhost:3001`
-- Noter Client ID et Client Secret
+📖 **Pour l'installation complète** (locale, OAuth, dépannage), consultez [INSTALLATION.md](INSTALLATION.md)
 
 ---
 

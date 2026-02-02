@@ -9,7 +9,6 @@
 - [Base de données et Prisma](#base-de-données-et-prisma)
 - [Tests](#tests)
 - [Développement local](#développement-local)
-- [Déploiement](#déploiement)
 - [Contribution](#contribution)
 
 ---
@@ -742,85 +741,24 @@ describe('Button', () => {
 
 ## Développement local
 
-### Prérequis
+### Installation
 
-- Node.js 18+ ou Bun
-- Docker & Docker Compose
-- Git
+📖 **Pour toutes les procédures d'installation détaillées**, consultez [INSTALLATION.md](INSTALLATION.md) qui couvre :
+- Installation avec Docker (recommandé)
+- Installation locale (backend + frontend + base de données)
+- Configuration OAuth (Discord, Google)
+- Variables d'environnement
+- Vérification et dépannage
 
-Vous aurez également besoin de configurer OAuth pour l'authentification via Discord et/ou Google.
-
-**Discord** : [Discord Developer Portal](https://discord.com/developers/applications)
-- Créer une application
-- Ajouter redirect URI : `http://localhost:3000/auth/discord/callback`
-- Noter Client ID et Client Secret
-
-**Google** : [Google Cloud Console](https://console.cloud.google.com/)
-- Créer un projet et activer People API
-- Créer identifiant OAuth 2.0
-- Ajouter redirect URI : `http://localhost:3000/auth/google/callback`
-- Ajouter URL Javascript autorisée : `http://localhost:3001`
-- Noter Client ID et Client Secret
-
-### Variables d'environnement
-
-**API** (`.env` ou `docker-compose.yml`) :
-```env
-DATABASE_URL=postgresql://root:RootPassword@localhost:5432/fread_db
-PORT=3001
-JWT_SECRET=your-super-secret-key-min-32-characters
-AUTH_DISCORD_ID=your-discord-client-id
-AUTH_DISCORD_SECRET=your-discord-client-secret
-DISCORD_REDIRECT_URI=http://localhost:3000/auth/discord/callback
-AUTH_GOOGLE_ID=your-google-client-id
-AUTH_GOOGLE_SECRET=your-google-client-secret
-GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
-```
-
-### Installation complète
+### Démarrage rapide
 
 ```bash
-# Cloner le dépôt
-git clone https://github.com/Wiibleyde/Fread
-cd Fread
-
-# Démarrer avec Docker (recommandé)
-docker compose build
+# Avec Docker (recommandé)
 docker compose up -d
 
-# Vérifier que tout fonctionne
-curl http://localhost:3001/status  # API
-open http://localhost:3000          # Frontend
-```
-
-### Développement sans Docker
-
-**Backend** :
-```bash
-cd api
-bun install
-bun run db:generate
-bun run db:migrate
-bun run index.ts
-```
-
-**Frontend** :
-```bash
-cd front
-bun install
-bun run dev
-```
-
-**Base de données** :
-```bash
-# Démarrer PostgreSQL avec Docker
-docker run -d \
-  --name fread-postgres \
-  -e POSTGRES_USER=root \
-  -e POSTGRES_PASSWORD=RootPassword \
-  -e POSTGRES_DB=fread_db \
-  -p 5432:5432 \
-  postgres:16
+# OU sans Docker
+cd api && bun install && bun run db:generate && bun run db:migrate && bun run index.ts
+cd front && bun install && bun run dev
 ```
 
 ---
