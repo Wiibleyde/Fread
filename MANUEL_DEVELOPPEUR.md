@@ -195,18 +195,27 @@ class AccountController {
     const id = req.params.id;
     const viewerId = req.account?.id;
 
+    if (!id) {
+			return { account: null, retrieved: false };
+		}
+
     const account = await getAccountByIdDB(id);
-    const postsCount = await getPostsCountByAccountId(id);
-    const followersCount = await getFollowersCount(id);
+		if (!account) {
+			return { account: null, retrieved: false };
+		}
 
     return {
-      account: {
-        ...account,
-        postsCount,
-        followersCount
-      },
-      retrieved: true
-    };
+			retrieved: !!account,
+			account: {
+				...account,
+				postsCount: await getPostsCountByAccountId(account.id),
+				followingCount: await getFollowingCount(account.id),
+				followersCount: await getFollowersCount(account.id),
+				followers: await getFollowersByAccountId(account.id),
+				follows: await getFollowingByAccountId(account.id),
+				isFollowing: viewerId ? await isFollowing(account.id, viewerId) : false,
+			},
+		};
   }
 }
 ```
@@ -319,8 +328,8 @@ bun test:watch        # Mode watch
 bun test:coverage     # Couverture de code
 
 # Base de données
-bun run db:generate   # Générer le client Prisma
 bun run db:migrate    # Créer et appliquer une migration
+bun run db:generate   # Générer le client Prisma
 ```
 
 ---

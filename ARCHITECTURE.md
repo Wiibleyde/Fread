@@ -55,6 +55,8 @@ Fread suit une architecture moderne full-stack avec séparation claire entre fro
 - **Conteneurisation** : Docker + Docker Compose
 - **Serveur web (prod)** : Nginx (pour le frontend)
 
+📖 **Pour l'installation et la configuration**, consultez [INSTALLATION.md](INSTALLATION.md)
+
 ---
 
 ## Styles Architecturaux
@@ -83,7 +85,7 @@ Séparation stricte en 3 couches distinctes pour maintenir un code propre, modul
 ```typescript
 {
   method: "get",
-  path: "/account/:id",
+  path: `${prefix}/:id`,  // prefix = "/account"
   middlewares: [
     validateParams(idParamSchema, "params"),
     optionalAuthMiddleware,
@@ -104,30 +106,30 @@ class AccountController {
     const id = req.params.id;
     const viewerId = req.account?.id;
 
+    if (!id) {
+      return { account: null, retrieved: false };
+    }
+
     logger.debug("Retrieving profile");
     const account = await getAccountByIdDB(id);
-    
     if (!account) {
       return { account: null, retrieved: false };
     }
-    
+
     // Logique métier : vérification des permissions, agrégation de données
-    const postsCount = await getPostsCountByAccountId(id);
-    const followersCount = await getFollowersCount(id);
-    const followingCount = await getFollowingCount(id);
-    const isFollowing = viewerId ? await isFollowing(viewerId, id) : false;
-    
     return {
+      retrieved: !!account,
       account: {
         ...account,
-        postsCount,
-        followersCount,
-        followingCount,
-        isFollowing,
+        postsCount: await getPostsCountByAccountId(account.id),
+        followingCount: await getFollowingCount(account.id),
+        followersCount: await getFollowersCount(account.id),
+        followers: await getFollowersByAccountId(account.id),
+        follows: await getFollowingByAccountId(account.id),
+        isFollowing: viewerId ? await isFollowing(account.id, viewerId) : false,
       },
-      retrieved: true
     };
-  }
+  };
 }
 ```
 
@@ -138,6 +140,14 @@ class AccountController {
 export const getAccountByIdDB = (id: string) => {
   return prisma.account.findUnique({
     where: { id },
+    include: {
+      profilePicture: {
+        select: {
+          id: true,
+          fileName: true,
+        },
+      },
+    },
   });
 };
 
@@ -189,9 +199,13 @@ export const createAccountDB = (data: CreateAccountData) => {
     data: {
       username: data.username,
       displayName: data.displayName,
-      description: data.description,
+      description: data.description as string,
       private: data.private,
-      // ... structure métier pure
+      profilePictureId: data.profilePictureId,
+      appleId: data.appleId,
+      googleId: data.googleId,
+      discordId: data.discordId,
+      profileCompleted: data.profileCompleted,
     },
   });
 };
@@ -238,9 +252,18 @@ Garantit qu'une seule instance du client Prisma existe dans toute l'application.
 
 `api/prisma.ts`
 ```typescript
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
+import { PrismaClient } from "./generated/prisma/client";
+import { Logger } from "./utils/logger";
+
+const { Pool } = pg;
+
 const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
+
+const logger = new Logger("prisma");
 
 function createPrismaClient() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -254,10 +277,12 @@ function createPrismaClient() {
 // ✨ Singleton : réutilise l'instance existante ou en crée une nouvelle
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
+prisma.$on("query", (e) => {
+  logger.debug(`[Prisma] ${e.query} ${e.params} (${e.duration}ms)`);
+});
+
 // En développement, stocke l'instance dans globalThis pour persister entre les rechargements
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
 
 #### Utilisation
@@ -298,7 +323,16 @@ export interface RouteDescriptor {
 
 `api/builder/routeRegister.ts`
 ```typescript
-export function registerRoutes(router: Router, routes: RouteDescriptor[]) {
+import type { Router } from "express";
+import type { RouteDescriptor } from "../models/route.model";
+import { Logger } from "../utils/logger";
+
+export function registerRoutes(
+  router: Router,
+  routes: RouteDescriptor[]
+) {
+  const logger = Logger.here();
+
   routes.forEach(route => {
     logger.debug(`Registering route [${route.method.toUpperCase()}] ${route.path}`);
     router[route.method](
@@ -322,18 +356,21 @@ const createAccountRoutes = (): RouteDescriptor[] => {
     {
       method: "get",
       path: `${prefix}/:id`,
-      middlewares: [validateParams(idParamSchema), optionalAuthMiddleware],
+      middlewares: [
+        validateParams(idParamSchema, "params"),
+        optionalAuthMiddleware,
+      ],
       handler: asyncHandler(async (req, res) => {
-        const result = await controller.getProfile(req);
+        const result = await controller.getProfile(req as AuthenticatedRequest);
         res.json(result);
       }),
     },
     {
       method: "patch",
       path: `${prefix}`,
-      middlewares: [authMiddleware, validateBody(accountEditSchema)],
+      middlewares: [authMiddleware, validateBody(accountEditSchema, "body")],
       handler: asyncHandler(async (req, res) => {
-        const result = await controller.editAccount(req);
+        const result = await controller.editAccount(req as AuthenticatedRequest);
         res.json(result);
       }),
     },
@@ -427,15 +464,16 @@ jest.mock("../prisma", () => ({
   }
 }));
 
-describe('AccountService', () => {
-  it('should get account by id', async () => {
-    const mockAccount = { id: '1', username: 'test' };
-    (prisma.account.findUnique as jest.Mock).mockResolvedValue(mockAccount);
+describe("getAccountByUsernameDB", () => {
+  it("récupère un compte via son username", async () => {
+    prismaMock.account.findUnique.mockResolvedValue(baseAccount);
 
-    const result = await getAccountByIdDB('1');
+    const result = await getAccountByUsernameDB(baseAccount.username);
 
-    expect(result).toEqual(mockAccount);
-    expect(prisma.account.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
+    expect(prismaMock.account.findUnique).toHaveBeenCalledWith({
+        where: { username: baseAccount.username },
+    });
+    expect(result).toBe(baseAccount);
   });
 });
 ```
@@ -507,68 +545,143 @@ api/
 #### 1. Authentification (`middleware/auth.ts`)
 
 ```typescript
-export const authMiddleware = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (!token) {
-    throw new UnauthorizedError('Token manquant');
-  }
-  
-  const decoded = verifyJWT(token);
-  req.account = decoded;
-  next();
+export const authMiddleware: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const token = getTokenFromAuthorizationHeader(req);
+
+        if (!token) {
+            log.warn("Auth failed: no token provided in Authorization header");
+            return next(new UnauthorizedError("Unauthorized"));
+        }
+
+        const payload = verifyJWT(token);
+
+        if (!payload) {
+            log.warn("Auth failed: invalid token");
+            return next(new UnauthorizedError("Unauthorized"));
+        }
+
+        const account = await authenticateUser(payload.id);
+
+        if (!account) {
+            log.warn("Auth failed: user not found for token subject");
+            return next(new UnauthorizedError("Unauthorized"));
+        }
+
+        (req as AuthenticatedRequest).account = account;
+        log.debug("Authenticated request");
+        next();
+    } catch (_err) {
+        log.error("Auth middleware error");
+        return next(new UnauthorizedError("Unauthorized"));
+    }
 };
 ```
 
 #### 2. Authentification optionnelle (`middleware/optional-auth.ts`)
 
 ```typescript
-export const optionalAuthMiddleware = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (token) {
+export const optionalAuthMiddleware: RequestHandler = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
-      req.account = verifyJWT(token);
-    } catch (e) {
-      // Ignore l'erreur, continue sans auth
+        const token = getTokenFromAuthorizationHeader(req);
+
+        if (!token) {
+            log.debug("No token provided, proceeding as guest");
+            return next();
+        }
+
+        const payload = verifyJWT(token);
+
+        if (!payload) {
+            log.debug("Invalid token, proceeding as guest");
+            return next();
+        }
+
+        const account = await authenticateUser(payload.id);
+
+        if (!account) {
+            log.debug("No account found for token subject, proceeding as guest");
+            return next();
+        }
+
+		(req as AuthenticatedRequest).account = account || undefined;
+		log.debug("Authenticated in optional auth middleware");
+        next();
+    } catch (_err) {
+        log.warn("Optional auth middleware error; treating as guest");
+        return next();
     }
-  }
-  
-  next();
-};
+}
 ```
 
 #### 3. Validation (`middleware/validate.ts`)
 
 ```typescript
-export const validateBody = (schema: ZodSchema) => {
-  return (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    
-    if (!result.success) {
-      throw new BadRequestError('Validation failed', result.error);
-    }
-    
-    req.body = result.data;
-    next();
-  };
-};
+function makeValidator(getPart: (req: Request) => unknown, setPart?: (req: Request, value: unknown) => void) {
+    return (schema: ZodTypeAny, label: string): RequestHandler => {
+        return (req: Request, _res: Response, next: NextFunction) => {
+            const result = schema.safeParse(getPart(req));
+            if (!result.success) {
+                log.warn(`Invalid ${label}`);
+                const first = result.error.issues?.[0];
+                const message = first?.message || "Invalid input";
+                return next(new BadRequestError(message));
+            }
+            if (setPart) setPart(req, result.data);
+            next();
+        };
+    };
+}
+
+export const validateBody = makeValidator(
+    (req) => req.body,
+    (req, val) => { req.body = val as Record<string, unknown>; }
+);
+
+export const validateParams = makeValidator(
+    (req) => req.params,
+    (req, val) => { req.params = val as Record<string, string>; }
+);
+
+export const validateQuery = makeValidator(
+    (req) => req.query,
+    (req, val) => { req.query = val as Record<string, string>; }
+);
+
 ```
 
 #### 4. Gestion d'erreurs (`middleware/error.ts`)
 
 ```typescript
-export const errorMiddleware = (err, req, res, next) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      error: err.message,
-      details: err.details,
-    });
-  }
-  
-  // Erreur inconnue
-  res.status(500).json({ error: 'Internal server error' });
-};
+export function errorMiddleware(
+    err: Error,
+    _req: Request,
+    res: Response,
+    _next: NextFunction,
+) {
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({
+            error: err.message,
+            ...(err.data ?? {}),
+        });
+    }
+
+    // Stack trace uniquement en niveau debug pour éviter de logguer trop d'infos sensibles
+    if (log.minLevel === "debug") {
+        log.error("Unhandled error (debug)", err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : err);
+    } else {
+        log.error("Unhandled error");
+    }
+    res.status(500).json({ error: "Internal server error" });
+}
 ```
 
 ### Gestion des erreurs
@@ -577,25 +690,33 @@ Toutes les erreurs héritent de `AppError` :
 
 ```typescript
 // errors/AppError.ts
-export class AppError extends Error {
+class AppError extends Error {
   constructor(
-    public message: string,
+    public override message: string,
     public statusCode: number,
-    public details?: any
+    public data?: Record<string, unknown>
   ) {
     super(message);
   }
 }
 
+export default AppError;
+
 // errors/badrequest.error.ts
-export class BadRequestError extends AppError {
-  constructor(message: string, details?: any) {
-    super(message, 400, details);
+class BadRequestError extends AppError {
+  constructor(message: string, data?: Record<string, unknown>) {
+    super(message, 400, data);
   }
 }
 
+export default BadRequestError;
+
 // Autres : UnauthorizedError (401), ForbiddenError (403), NotFoundError (404)
 ```
+
+### Création de middlewares personnalisés
+
+Vous pouvez créer des middlewares personnalisés en suivant le modèle ci-dessus. Par exemple, un middleware qui empeche l'accès aux utilisateurs non administrateurs et l'utiliser dans une route en suivant le modèle des autres middlewares.
 
 ---
 
@@ -997,7 +1118,7 @@ export const storage = {
   handler: controller.create,
 }
 
-// Route publique avec auth optionnelle
+// Route publique avec auth optionnelle ça peut empecher l'accès à certaines données lorsqu'elles sont privées
 {
   method: "get",
   path: "/post/:id",

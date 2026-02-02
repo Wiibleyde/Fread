@@ -14,6 +14,7 @@
 ## Sommaire
 
 - [Description du projet](#description-du-projet)
+- [Besoins utilisateurs](#besoins-utilisateurs)
 - [Stack technique](#stack-technique)
 - [Installation](#installation)
 - [Aperçu rapide de l'API](#aperçu-rapide-de-lapi)
@@ -41,6 +42,17 @@ Fread est une application de réseau social qui permet aux utilisateurs de parta
 - Gérer la confidentialité de son compte et de ses posts
 
 ---
+
+## Besoins utilisateurs
+
+Cette section décrit le besoin métier auquel l'application doit répondre, c'est-à-dire ce que Fread doit permettre à ses utilisateurs de faire au quotidien :
+
+- Partager des messages courts (posts texte) pour exprimer des idées, opinions ou actualités.
+- Interagir avec le contenu des autres via des likes, des réponses et le suivi d'autres comptes (follow) pour créer une dynamique de conversation.
+- Gérer son identité numérique à travers un profil personnalisable (nom affiché, description, confidentialité du compte et photo de profil).
+- Accéder à un fil d'actualité pertinent en fonction des comptes suivis et de la visibilité (public/privé) des contenus.
+- Consulter les profils et les posts publics sans être connecté, afin de découvrir la plateforme avant de créer un compte.
+Ces besoins fonctionnels guident la conception des fonctionnalités, des routes de l'API et de la structure de la base de données.
 
 ## Stack technique
 

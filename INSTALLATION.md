@@ -170,14 +170,8 @@ bun run dev
 
 ### Backend (`api/.env`)
 
-**Configuration minimale (sans OAuth)** :
-```env
-DATABASE_URL=postgresql://root:RootPassword@localhost:5432/fread_db
-PORT=3001
-JWT_SECRET=your-super-secret-key-minimum-32-characters-required
-```
-
 **Configuration complète (avec OAuth)** :
+
 ```env
 # Base de données
 DATABASE_URL=postgresql://root:RootPassword@localhost:5432/fread_db
@@ -203,14 +197,6 @@ GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
 - `JWT_SECRET` : Doit contenir au moins 32 caractères (validé par Zod dans `api/env.ts`)
 - `DATABASE_URL` : Si vous utilisez Docker Compose, remplacez `localhost` par `postgres` (nom du service Docker)
 
-### Frontend (`front/.env.local`)
-
-```env
-VITE_API_URL=http://localhost:3001
-```
-
-**Note** : Changez `VITE_API_URL` si votre API tourne sur un autre port ou domaine.
-
 ---
 
 ## Vérification de l'installation
@@ -222,7 +208,7 @@ VITE_API_URL=http://localhost:3001
 curl http://localhost:3001/status
 
 # Réponse attendue
-{"status":"ok","database":"connected"}
+{"status":"ok","timestamp":"2024-06-01T12:00:00.000Z"}
 ```
 
 ### 2. Vérifier le frontend
