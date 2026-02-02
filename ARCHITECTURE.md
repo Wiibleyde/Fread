@@ -5,6 +5,10 @@
 - [Vue d'ensemble](#vue-densemble)
 - [Styles Architecturaux](#styles-architecturaux)
 - [Design Patterns](#design-patterns)
+  - [Singleton](#1-singleton-gestion-de-la-connexion-base-de-données)
+  - [Builder](#2-builder-création-des-routes)
+  - [Factory](#3-factory-création-des-services)
+  - [Strategy](#4-strategy-gestion-de-lauthentification-oauth)
 - [Architecture Backend](#architecture-backend)
 - [Architecture Frontend](#architecture-frontend)
 - [Architecture de la base de données](#architecture-de-la-base-de-données)
@@ -56,6 +60,10 @@ Fread suit une architecture moderne full-stack avec séparation claire entre fro
 - **Serveur web (prod)** : Nginx (pour le frontend)
 
 📖 **Pour l'installation et la configuration**, consultez [INSTALLATION.md](INSTALLATION.md)
+
+📊 **Pour la modélisation DDD du domaine métier**, consultez [DOMAINE_METIER.md](DOMAINE_METIER.md)
+
+📝 **Diagrammes C4** : Les diagrammes d'architecture C4 (Contexte, Conteneurs, Composants, Code) sont disponibles dans le dossier [diagrammes/](diagrammes/)
 
 ---
 
@@ -477,6 +485,130 @@ describe("getAccountByUsernameDB", () => {
   });
 });
 ```
+
+---
+
+### 4. Strategy (gestion de l'authentification OAuth)
+
+**Catégorie** : Pattern comportemental
+
+Le pattern Strategy permet de définir une famille d'algorithmes (ici, les stratégies d'authentification OAuth), de les encapsuler et de les rendre interchangeables.
+
+#### Problème résolu
+
+- ❌ Sans Strategy : Code conditionnel complexe pour gérer Discord, Google, Apple OAuth
+- ✅ Avec Strategy : Chaque provider OAuth est une stratégie distincte, facilement extensible
+
+#### Implémentation
+
+**Stratégie Discord** : `api/services/oauth.service.ts`
+
+```typescript
+export const exchangeCodeForTokenDiscord = async (code: string) => {
+  // Stratégie spécifique à Discord
+  const params = new URLSearchParams({
+    client_id: process.env.AUTH_DISCORD_ID,
+    client_secret: process.env.AUTH_DISCORD_SECRET,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: process.env.DISCORD_REDIRECT_URI,
+  });
+
+  const response = await fetch("https://discord.com/api/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  return response.json();
+};
+
+export const getUserDataDiscord = async (accessToken: string) => {
+  const response = await fetch("https://discord.com/api/users/@me", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return response.json();
+};
+```
+
+**Stratégie Google** : `api/services/oauth.service.ts`
+
+```typescript
+export const exchangeCodeForTokenGoogle = async (code: string) => {
+  // Stratégie spécifique à Google
+  const params = new URLSearchParams({
+    client_id: process.env.AUTH_GOOGLE_ID,
+    client_secret: process.env.AUTH_GOOGLE_SECRET,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+  });
+
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
+
+  return response.json();
+};
+
+export const getUserDataGoogle = async (accessToken: string) => {
+  const response = await fetch(
+    "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses",
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  return response.json();
+};
+```
+
+**Utilisation dans le controller** : `api/controllers/auth.controller.ts`
+
+```typescript
+class AuthController {
+  discordCallback = async (req: AuthenticatedRequest) => {
+    // Sélection de la stratégie Discord
+    const tokenData = await exchangeCodeForTokenDiscord(req.query.code);
+    const userData = await getUserDataDiscord(tokenData.access_token);
+    
+    // Logique commune après récupération des données
+    let account = await getAccountByDiscordIdDB(userData.id);
+    if (!account) {
+      account = await createAccountDB({
+        discordId: userData.id,
+        username: userData.username,
+        // ...
+      });
+    }
+    
+    const jwt = generateJWT({ id: account.id });
+    return { token: jwt };
+  };
+
+  googleCallback = async (req: AuthenticatedRequest) => {
+    // Sélection de la stratégie Google
+    const tokenData = await exchangeCodeForTokenGoogle(req.query.code);
+    const userData = await getUserDataGoogle(tokenData.access_token);
+    
+    // Logique commune (identique à Discord)
+    // ...
+  };
+}
+```
+
+#### Avantages
+
+- ✅ **Extensibilité** : Ajout facile d'un nouveau provider OAuth (Apple, GitHub, etc.)
+- ✅ **Isolation** : Chaque stratégie est indépendante
+- ✅ **Testabilité** : Chaque stratégie peut être testée séparément
+- ✅ **Maintenabilité** : Modifications d'un provider n'impactent pas les autres
+
+#### Pour ajouter un nouveau provider
+
+1. Créer `exchangeCodeForTokenApple` et `getUserDataApple`
+2. Ajouter `appleCallback` dans `AuthController`
+3. Ajouter la route dans `auth.route.ts`
+4. Aucune modification du code existant nécessaire !
 
 ---
 
@@ -1241,10 +1373,16 @@ Cette architecture combine les meilleures pratiques modernes :
 
 ✅ **Séparation des responsabilités** (Layered Architecture)
 ✅ **Indépendance du domaine** (Clean Architecture)
-✅ **Patterns éprouvés** (Singleton, Builder, Factory)
+✅ **Patterns éprouvés** : 
+   - Création : Singleton, Factory
+   - Structurel : Builder
+   - Comportemental : Strategy
 ✅ **Sécurité** (JWT, OAuth, validation)
 ✅ **Performance** (Cache, optimistic updates, indexes)
 ✅ **Testabilité** (Mocks, injection de dépendances)
 ✅ **Maintenabilité** (Code organisé, conventions claires)
+✅ **Modélisation DDD** (Bounded contexts, aggregates, services)
 
 Pour plus de détails sur l'implémentation, consultez le [Manuel Développeur](MANUEL_DEVELOPPEUR.md).
+
+Pour la modélisation du domaine métier, consultez [DOMAINE_METIER.md](DOMAINE_METIER.md).

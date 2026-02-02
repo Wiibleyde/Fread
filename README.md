@@ -7,8 +7,10 @@
 | **[README.md](README.md)** | Vue d'ensemble du projet, démarrage rapide | Tous |
 | **[INSTALLATION.md](INSTALLATION.md)** | Guide d'installation complet : Docker, local, OAuth, dépannage | Tous |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Architecture complète : styles architecturaux, design patterns, flux de données | Architectes, développeurs |
+| **[DOMAINE_METIER.md](DOMAINE_METIER.md)** | Modélisation DDD : bounded contexts, entités, aggregates, services | Architectes, développeurs |
 | **[MANUEL_UTILISATEUR.md](MANUEL_UTILISATEUR.md)** | Guide complet d'utilisation de l'application et de l'API | Utilisateurs finaux, testeurs |
 | **[MANUEL_DEVELOPPEUR.md](MANUEL_DEVELOPPEUR.md)** | Documentation technique détaillée, conventions de code, contribution | Développeurs, contributeurs |
+| **[Diagrammes C4](diagrammes/)** | Diagrammes d'architecture C4 (contexte, conteneurs, composants, code) | Architectes, développeurs |
 | **[API Postman](api/postman/Fread.postman_collection.json)** | Collection Postman pour tester les routes de l'API | Développeurs, testeurs API |
 
 ## Sommaire
